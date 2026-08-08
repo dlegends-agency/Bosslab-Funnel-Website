@@ -2072,3 +2072,68 @@ button.fk-flow-card {
     flex-direction: column;
   }
 }
+
+/* Email test */
+
+.fk-email-test {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(240px, 0.8fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.fk-email-test__panel,
+.fk-email-test__aside {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  padding: 1.25rem 1.35rem 1.4rem;
+}
+
+.fk-email-test__intro h2,
+.fk-email-test__aside h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1.05rem;
+}
+
+.fk-email-test__intro p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.fk-email-test__form {
+  margin-top: 0.35rem;
+}
+
+.fk-email-test__form .fk-field:first-child {
+  margin-top: 1rem;
+}
+
+.fk-email-test__actions {
+  margin-top: 1.15rem;
+}
+
+.fk-email-test__aside ol {
+  margin: 0.75rem 0 0;
+  padding-left: 1.15rem;
+  color: #6b7280;
+  display: grid;
+  gap: 0.65rem;
+  line-height: 1.45;
+  font-size: 0.9rem;
+}
+
+.fk-email-test code,
+.fk-email-test__aside a {
+  color: #2563eb;
+}
+
+.fk-email-test__aside a:hover {
+  color: #1d4ed8;
+}
+
+@media (max-width: 900px) {
+  .fk-email-test {
+    grid-template-columns: 1fr;
+  }
+}

@@ -6,6 +6,7 @@ import { AutomationsPage } from './admin/AutomationsPage'
 import { ContactDetailPage } from './admin/ContactDetailPage'
 import { ContactsPage } from './admin/ContactsPage'
 import { DashboardPage } from './admin/DashboardPage'
+import { EmailTestPage } from './admin/EmailTestPage'
 import { ListsPage } from './admin/ListsPage'
 import { SettingsPage } from './admin/SettingsPage'
 import { TagsPage } from './admin/TagsPage'
@@ -55,6 +56,7 @@ function App() {
           <Route path="tags" element={<TagsPage />} />
           <Route path="automations" element={<AutomationsPage />} />
           <Route path="automations/:id" element={<AutomationEditorPage />} />
+          <Route path="email-test" element={<EmailTestPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
         <Route

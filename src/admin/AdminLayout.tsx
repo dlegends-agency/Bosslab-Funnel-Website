@@ -86,6 +86,9 @@ export function AdminLayout() {
             <NavLink to="/admin/automations" className={navClass}>
               Automations
             </NavLink>
+            <NavLink to="/admin/email-test" className={navClass}>
+              Email Test
+            </NavLink>
             <NavLink to="/admin/settings" className={navClass}>
               Settings
             </NavLink>
