@@ -6,6 +6,7 @@ import { Dashboard } from '../components/Dashboard'
 import { Industries } from '../components/Industries'
 import { Testimonials } from '../components/Testimonials'
 import { Comparison } from '../components/Comparison'
+import { CantIJustUse } from '../components/CantIJustUse'
 import { Pricing } from '../components/Pricing'
 import { Faq } from '../components/Faq'
 import { Footer } from '../components/Footer'
@@ -23,6 +24,7 @@ export function HomePage() {
       <Industries />
       <Testimonials />
       <Comparison />
+      <CantIJustUse onCtaClick={() => setOptinOpen(true)} />
       <Pricing onCtaClick={() => setOptinOpen(true)} />
       <Faq />
       <Footer />
