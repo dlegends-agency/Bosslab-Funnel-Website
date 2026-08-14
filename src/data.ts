@@ -134,6 +134,106 @@ export const pricingPlans: PricingPlan[] = [
   },
 ]
 
+export type ToolComparison = {
+  id: string
+  name: string
+  avatar: string
+  tag: string
+  subtitle: string
+  nails: string[]
+  stops: string[]
+  moment: string
+  verdict: string
+  tone: 'red' | 'blue' | 'orange' | 'pink'
+}
+
+export const toolComparisons: ToolComparison[] = [
+  {
+    id: 'chatgpt',
+    name: '...ChatGPT?',
+    avatar: 'C',
+    tag: 'NOT QUITE',
+    subtitle: 'Great advice. Zero execution.',
+    nails: [
+      'Drafts a caption or a call script in seconds',
+      'Answers "what should I post" at 2am',
+      'Brainstorms offers, emails, and replies',
+    ],
+    stops: [
+      "Doesn't answer your phone or text leads back",
+      "Can't post, schedule, or run anything itself",
+      'You still copy-paste everything into five other tools',
+    ],
+    moment:
+      'The chat window closes and nothing happened. No call answered, no post published, no lead followed up — just a really good draft sitting in your history.',
+    verdict: 'A copywriter. Not an employee.',
+    tone: 'red',
+  },
+  {
+    id: 'zapier',
+    name: '...Zapier?',
+    avatar: 'Z',
+    tag: 'NOT QUITE',
+    subtitle: 'Wires your apps together — if you already know what to wire.',
+    nails: [
+      'Connects the tools you already pay for',
+      'Runs simple if-this-then-that automations',
+      'Great once a workflow is fully mapped out',
+    ],
+    stops: [
+      "Doesn't answer calls, write ads, or create content",
+      'You design, test, and debug every workflow yourself',
+      'Every tool it connects is still a separate subscription',
+    ],
+    moment:
+      "You're three hours into building a lead-followup Zap, hit a broken step, and realize you basically hired yourself as the ops team.",
+    verdict: 'Plumbing. Not a plumber.',
+    tone: 'blue',
+  },
+  {
+    id: 'va',
+    name: '...a Virtual Assistant?',
+    avatar: 'V',
+    tag: 'NOT QUITE',
+    subtitle: 'A real person — with a paycheck, hours, and a learning curve.',
+    nails: [
+      'Handles tasks you actually explain well',
+      'Adds a human touch to messages',
+      'Can make judgment calls once trained',
+    ],
+    stops: [
+      "Off nights, weekends, and when they're sick",
+      "Weeks of onboarding before they're useful",
+      'One VA, one skill set — not calls + ads + social + CRM',
+    ],
+    moment:
+      "It's Friday at 6pm, a lead texts in, and your VA clocked out an hour ago. The lead calls your competitor instead.",
+    verdict: 'A helper. Not a team.',
+    tone: 'orange',
+  },
+  {
+    id: 'agency',
+    name: '...a Marketing Agency?',
+    avatar: 'A',
+    tag: 'NOT QUITE',
+    subtitle: 'Professional work. Agency timelines and agency invoices.',
+    nails: [
+      'Produces polished ads and content',
+      'Brings real strategy experience',
+      'Handles the accounts you hand them',
+    ],
+    stops: [
+      '$2,000+/month retainers before results show up',
+      'Days to turn around one campaign, not minutes',
+      "Doesn't touch your calls, leads, or CRM at all",
+    ],
+    moment:
+      'You approve the invoice before you see the results, then wait two weeks for round one of "the ad."',
+    verdict: 'A vendor. Not your team.',
+    tone: 'pink',
+  },
+]
+
 export type Testimonial = {
   name: string
   handle: string
