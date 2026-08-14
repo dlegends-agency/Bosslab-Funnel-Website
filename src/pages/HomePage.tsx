@@ -12,7 +12,9 @@ import { Comparison } from '../components/Comparison'
 import { CantIJustUse } from '../components/CantIJustUse'
 import { Pricing } from '../components/Pricing'
 import { Faq } from '../components/Faq'
+import { FinalCta } from '../components/FinalCta'
 import { Footer } from '../components/Footer'
+import { ScrollToTopButton } from '../components/ScrollToTopButton'
 import { OptinModal } from '../components/OptinModal'
 
 export function HomePage() {
@@ -33,7 +35,9 @@ export function HomePage() {
       <CantIJustUse onCtaClick={() => setOptinOpen(true)} />
       <Pricing onCtaClick={() => setOptinOpen(true)} />
       <Faq />
+      <FinalCta onCtaClick={() => setOptinOpen(true)} />
       <Footer />
+      <ScrollToTopButton />
       <OptinModal open={optinOpen} onClose={() => setOptinOpen(false)} />
     </>
   )
