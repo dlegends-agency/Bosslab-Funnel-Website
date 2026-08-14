@@ -87,6 +87,192 @@
   }
 }
 
+/* ——— Starfield backdrop ——— */
+.starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.starfield__nebula {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(700px 500px at 15% 8%, rgba(120, 90, 255, 0.16), transparent 60%),
+    radial-gradient(900px 700px at 55% 42%, rgba(60, 210, 130, 0.09), transparent 65%),
+    radial-gradient(800px 600px at 8% 88%, rgba(190, 40, 70, 0.14), transparent 60%),
+    radial-gradient(800px 600px at 92% 30%, rgba(130, 40, 190, 0.1), transparent 60%),
+    radial-gradient(700px 550px at 85% 90%, rgba(190, 30, 60, 0.1), transparent 60%),
+    #030308;
+}
+
+.starfield__layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 2px;
+  background: transparent;
+  border-radius: 50%;
+  animation: star-drift linear infinite;
+}
+
+.starfield__layer--small {
+  animation-duration: 150s;
+  opacity: 0.55;
+}
+
+.starfield__layer--medium {
+  animation-duration: 100s;
+  opacity: 0.75;
+}
+
+.starfield__layer--large {
+  animation-duration: 65s;
+  opacity: 0.9;
+}
+
+@keyframes star-drift {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(1.2vw, -50vh);
+  }
+  100% {
+    transform: translate(0, -100vh);
+  }
+}
+
+.starfield__sparkle {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  clip-path: polygon(
+    50% 0%,
+    64% 36%,
+    100% 50%,
+    64% 64%,
+    50% 100%,
+    36% 64%,
+    0% 50%,
+    36% 36%
+  );
+  animation: sparkle-twinkle 4.5s ease-in-out infinite;
+}
+
+.starfield__sparkle--a {
+  top: 18%;
+  left: 86%;
+  width: 16px;
+  height: 16px;
+  background: var(--success);
+  filter: drop-shadow(0 0 6px rgba(46, 204, 113, 0.85));
+  animation-delay: 0s;
+}
+
+.starfield__sparkle--b {
+  top: 59%;
+  left: 92%;
+  width: 10px;
+  height: 10px;
+  background: #ff5cb8;
+  filter: drop-shadow(0 0 6px rgba(255, 92, 184, 0.85));
+  animation-delay: 1.4s;
+}
+
+.starfield__sparkle--c {
+  top: 77%;
+  left: 17%;
+  width: 13px;
+  height: 13px;
+  background: var(--success);
+  filter: drop-shadow(0 0 6px rgba(46, 204, 113, 0.85));
+  animation-delay: 2.6s;
+}
+
+@keyframes sparkle-twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+.starfield__shooting-star {
+  position: absolute;
+  width: 160px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(120, 255, 160, 0.9) 70%,
+    #d6ffe4 100%
+  );
+  border-radius: 999px;
+  opacity: 0;
+  transform-origin: right center;
+}
+
+.starfield__shooting-star--a {
+  top: 46%;
+  left: 46%;
+  animation: shooting-star-a 8s ease-in infinite;
+  animation-delay: 1s;
+}
+
+.starfield__shooting-star--b {
+  top: 22%;
+  left: 65%;
+  width: 110px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 140, 200, 0.85) 70%,
+    #ffe1f2 100%
+  );
+  animation: shooting-star-b 9.5s ease-in infinite;
+  animation-delay: 5.2s;
+}
+
+@keyframes shooting-star-a {
+  0%,
+  92% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(-22deg) scaleX(0.3);
+  }
+  93% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(-22deg) scaleX(0.3);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(120px, -80px) rotate(-22deg) scaleX(1);
+  }
+}
+
+@keyframes shooting-star-b {
+  0%,
+  92% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(-16deg) scaleX(0.3);
+  }
+  93% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(-16deg) scaleX(0.3);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(110px, -55px) rotate(-16deg) scaleX(1);
+  }
+}
+
 /* ——— Hero ——— */
 .hero {
   position: relative;

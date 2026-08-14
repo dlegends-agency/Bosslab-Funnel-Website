@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { StarField } from '../components/StarField'
 import { Hero } from '../components/Hero'
 import { Problem } from '../components/Problem'
 import { QuickQa } from '../components/QuickQa'
@@ -18,6 +19,7 @@ export function HomePage() {
 
   return (
     <>
+      <StarField />
       <Hero onCtaClick={() => setOptinOpen(true)} />
       <Problem />
       <QuickQa onCtaClick={() => setOptinOpen(true)} />
