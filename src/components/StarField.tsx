@@ -11,9 +11,9 @@ function generateStars(count: number) {
 }
 
 export function StarField() {
-  const small = useMemo(() => generateStars(200), [])
-  const medium = useMemo(() => generateStars(90), [])
-  const large = useMemo(() => generateStars(35), [])
+  const small = useMemo(() => generateStars(120), [])
+  const medium = useMemo(() => generateStars(55), [])
+  const large = useMemo(() => generateStars(18), [])
 
   return (
     <div className="starfield" aria-hidden="true">
@@ -33,6 +33,7 @@ export function StarField() {
       <span className="starfield__sparkle starfield__sparkle--a" />
       <span className="starfield__sparkle starfield__sparkle--b" />
       <span className="starfield__sparkle starfield__sparkle--c" />
+      <span className="starfield__sparkle starfield__sparkle--d" />
       <span className="starfield__shooting-star starfield__shooting-star--a" />
       <span className="starfield__shooting-star starfield__shooting-star--b" />
     </div>
