@@ -230,15 +230,15 @@
 }
 
 .starfield__shooting-star--a {
-  top: 16%;
-  left: 38%;
+  top: 14%;
+  left: 60%;
   animation: shooting-star-a 9s ease-in infinite;
   animation-delay: 1s;
 }
 
 .starfield__shooting-star--b {
-  top: 8%;
-  left: 68%;
+  top: 6%;
+  left: 32%;
   width: 100px;
   background: linear-gradient(
     90deg,
@@ -250,20 +250,21 @@
   animation-delay: 5.2s;
 }
 
-/* Head (bright, right end of the gradient) leads a downward-right fall;
-   the tail trails behind toward the upper-left. */
+/* Head (bright, right end of the gradient) leads a downward-left fall
+   from top-right to bottom-left; the tail trails behind toward the
+   upper-right. */
 @keyframes shooting-star-a {
   0%,
   85% {
     opacity: 0;
-    transform: translate(-40px, -50px) rotate(28deg);
+    transform: translate(40px, -50px) rotate(152deg);
   }
   90% {
     opacity: 1;
   }
   100% {
     opacity: 0;
-    transform: translate(70px, 130px) rotate(28deg);
+    transform: translate(-70px, 130px) rotate(152deg);
   }
 }
 
@@ -271,14 +272,14 @@
   0%,
   85% {
     opacity: 0;
-    transform: translate(-30px, -40px) rotate(24deg);
+    transform: translate(30px, -40px) rotate(156deg);
   }
   90% {
     opacity: 1;
   }
   100% {
     opacity: 0;
-    transform: translate(55px, 100px) rotate(24deg);
+    transform: translate(-55px, 100px) rotate(156deg);
   }
 }
 
@@ -680,6 +681,116 @@
   color: var(--text-muted);
   font-size: 0.8rem;
   font-style: italic;
+}
+
+/* ——— Is This For Me ——— */
+.persona-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin: 2.75rem auto 0;
+  max-width: 1000px;
+}
+
+.persona-card {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  padding: 1.35rem;
+  border-radius: var(--radius-panel);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  isolation: isolate;
+}
+
+.persona-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(165deg, var(--tone-bg, rgba(174, 98, 255, 0.22)) 0%, rgba(6, 7, 16, 0.95) 65%);
+}
+
+.persona-card__watermark {
+  position: absolute;
+  top: -8%;
+  right: -12%;
+  z-index: -1;
+  width: 65%;
+  height: 65%;
+  color: var(--tone-color, #d8b4fe);
+  opacity: 0.16;
+  transform: rotate(8deg);
+}
+
+.persona-card__quote-mark {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--tone-color, #d8b4fe);
+  opacity: 0.85;
+}
+
+.persona-card__quote {
+  margin: 0.4rem 0 0;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.92rem;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+.persona-card__role {
+  display: block;
+  margin-top: 0.9rem;
+  color: var(--tone-color, #d8b4fe);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.persona-card--blue {
+  --tone-bg: rgba(59, 130, 246, 0.28);
+  --tone-color: #93c5fd;
+}
+
+.persona-card--emerald {
+  --tone-bg: rgba(16, 185, 129, 0.26);
+  --tone-color: #6ee7b7;
+}
+
+.persona-card--orange {
+  --tone-bg: rgba(249, 115, 22, 0.26);
+  --tone-color: #fdba74;
+}
+
+.persona-card--pink {
+  --tone-bg: rgba(236, 72, 153, 0.26);
+  --tone-color: #f9a8d4;
+}
+
+.persona-card--cyan {
+  --tone-bg: rgba(6, 182, 212, 0.26);
+  --tone-color: #67e8f9;
+}
+
+.persona-card--violet {
+  --tone-bg: rgba(174, 98, 255, 0.28);
+  --tone-color: #d8b4fe;
+}
+
+.persona-footnote {
+  margin: 2rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.persona-footnote strong {
+  color: var(--text);
 }
 
 /* ——— Industries ——— */
@@ -2055,6 +2166,10 @@
   .industries__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+
+  .persona-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 720px) {
@@ -2091,6 +2206,14 @@
 
   .industries__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .persona-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .persona-card {
+    aspect-ratio: auto;
   }
 
   .hero__visual img {

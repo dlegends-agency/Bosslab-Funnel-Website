@@ -5,6 +5,7 @@ import { Problem } from '../components/Problem'
 import { QuickQa } from '../components/QuickQa'
 import { AiTeam } from '../components/AiTeam'
 import { Dashboard } from '../components/Dashboard'
+import { IsThisForMe } from '../components/IsThisForMe'
 import { Industries } from '../components/Industries'
 import { Testimonials } from '../components/Testimonials'
 import { Comparison } from '../components/Comparison'
@@ -25,6 +26,7 @@ export function HomePage() {
       <QuickQa onCtaClick={() => setOptinOpen(true)} />
       <AiTeam />
       <Dashboard onCtaClick={() => setOptinOpen(true)} />
+      <IsThisForMe />
       <Industries />
       <Testimonials />
       <Comparison />

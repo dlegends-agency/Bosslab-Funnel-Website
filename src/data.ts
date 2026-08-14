@@ -43,6 +43,65 @@ export const bossLabBenefits = [
   'One Platform',
 ] as const
 
+export type Persona = {
+  id: string
+  quote: string
+  role: string
+  icon: string
+  tone: 'blue' | 'emerald' | 'orange' | 'pink' | 'cyan' | 'violet'
+}
+
+export const personas: Persona[] = [
+  {
+    id: 'roofer',
+    quote:
+      "I'm on a roof all day. Every missed call is a job I just handed to the competitor down the street.",
+    role: 'The Roofer',
+    icon: 'roof',
+    tone: 'orange',
+  },
+  {
+    id: 'salon',
+    quote:
+      "Between appointments I don't have three free minutes, let alone time to post on social media every day.",
+    role: 'The Salon Owner',
+    icon: 'scissors',
+    tone: 'pink',
+  },
+  {
+    id: 'plumber',
+    quote:
+      "I've got two guys and a truck. I don't have a marketing department, and I don't want one.",
+    role: 'The Plumber',
+    icon: 'wrench',
+    tone: 'blue',
+  },
+  {
+    id: 'dentist',
+    quote:
+      "My front desk is already juggling patients in the chair. They can't also be chasing down every missed call.",
+    role: 'The Office Manager',
+    icon: 'tooth',
+    tone: 'cyan',
+  },
+  {
+    id: 'realtor',
+    quote:
+      "Leads go cold in an hour. If I'm mid-showing, that's an hour someone else's agent is talking to my buyer.",
+    role: 'The Real Estate Agent',
+    icon: 'building',
+    tone: 'violet',
+  },
+  {
+    id: 'restaurant',
+    quote:
+      "I'm running the kitchen at 6pm when the reservation calls come in. Something has to answer that phone.",
+    role: 'The Restaurant Owner',
+    icon: 'leaf',
+    tone: 'emerald',
+  },
+]
+
 export const industries = [
   { name: 'Roofers', icon: 'roof' },
   { name: 'Plumbers', icon: 'wrench' },
