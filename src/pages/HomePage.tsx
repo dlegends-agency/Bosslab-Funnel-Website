@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Hero } from '../components/Hero'
 import { Problem } from '../components/Problem'
+import { QuickQa } from '../components/QuickQa'
 import { AiTeam } from '../components/AiTeam'
 import { Dashboard } from '../components/Dashboard'
 import { Industries } from '../components/Industries'
@@ -19,6 +20,7 @@ export function HomePage() {
     <>
       <Hero onCtaClick={() => setOptinOpen(true)} />
       <Problem />
+      <QuickQa onCtaClick={() => setOptinOpen(true)} />
       <AiTeam />
       <Dashboard onCtaClick={() => setOptinOpen(true)} />
       <Industries />

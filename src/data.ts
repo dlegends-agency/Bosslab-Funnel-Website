@@ -10,6 +10,23 @@ export const painPointsRight = [
   'Too many tools to manage',
 ] as const
 
+export const quickQaQuestions = [
+  'Can it answer my phone when I’m slammed with customers?',
+  'Can it text leads back the second they come in?',
+  'Can it write and post my social media for me?',
+  'Can it run my Facebook and Google ads?',
+  'Can it follow up with leads until they actually book?',
+  'Can it manage my CRM and keep contacts organized?',
+  'Can it send review requests after every job?',
+  'Can it build automations without me touching code?',
+  'Does it work for my industry — roofing, HVAC, salons, whatever I run?',
+  'Can I see everything from one dashboard?',
+  'Can I use it with zero tech experience?',
+  'Can I add more AI employees as I grow?',
+  'Does it work nights, weekends, and holidays?',
+  'Do I stay in control of what gets sent out?',
+] as const
+
 export const traditionalHiring = [
   'Hire Employees',
   'Monthly Salaries',
