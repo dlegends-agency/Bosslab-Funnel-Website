@@ -10,6 +10,23 @@ export const painPointsRight = [
   'Too many tools to manage',
 ] as const
 
+export const quickQaQuestions = [
+  'Can it answer my phone when I’m slammed with customers?',
+  'Can it text leads back the second they come in?',
+  'Can it write and post my social media for me?',
+  'Can it run my Facebook and Google ads?',
+  'Can it follow up with leads until they actually book?',
+  'Can it manage my CRM and keep contacts organized?',
+  'Can it send review requests after every job?',
+  'Can it build automations without me touching code?',
+  'Does it work for my industry — roofing, HVAC, salons, whatever I run?',
+  'Can I see everything from one dashboard?',
+  'Can I use it with zero tech experience?',
+  'Can I add more AI employees as I grow?',
+  'Does it work nights, weekends, and holidays?',
+  'Do I stay in control of what gets sent out?',
+] as const
+
 export const traditionalHiring = [
   'Hire Employees',
   'Monthly Salaries',
@@ -25,6 +42,69 @@ export const bossLabBenefits = [
   'Available Around The Clock',
   'One Platform',
 ] as const
+
+export type Persona = {
+  id: string
+  quote: string
+  role: string
+  image: string
+  tone: 'blue' | 'emerald' | 'orange' | 'pink' | 'cyan' | 'violet'
+}
+
+/**
+ * Images are placeholders (see public/images/personas/README.md) —
+ * swap in real photos at the same paths and aspect ratio (4:5).
+ */
+export const personas: Persona[] = [
+  {
+    id: 'roofer',
+    quote:
+      "I'm on a roof all day. Every missed call is a job I just handed to the competitor down the street.",
+    role: 'The Roofer',
+    image: '/images/personas/roofer.jpg',
+    tone: 'orange',
+  },
+  {
+    id: 'salon',
+    quote:
+      "Between appointments I don't have three free minutes, let alone time to post on social media every day.",
+    role: 'The Salon Owner',
+    image: '/images/personas/salon.jpg',
+    tone: 'pink',
+  },
+  {
+    id: 'plumber',
+    quote:
+      "I've got two guys and a truck. I don't have a marketing department, and I don't want one.",
+    role: 'The Plumber',
+    image: '/images/personas/plumber.jpg',
+    tone: 'blue',
+  },
+  {
+    id: 'dentist',
+    quote:
+      "My front desk is already juggling patients in the chair. They can't also be chasing down every missed call.",
+    role: 'The Office Manager',
+    image: '/images/personas/dentist.jpg',
+    tone: 'cyan',
+  },
+  {
+    id: 'realtor',
+    quote:
+      "Leads go cold in an hour. If I'm mid-showing, that's an hour someone else's agent is talking to my buyer.",
+    role: 'The Real Estate Agent',
+    image: '/images/personas/realtor.jpg',
+    tone: 'violet',
+  },
+  {
+    id: 'restaurant',
+    quote:
+      "I'm running the kitchen at 6pm when the reservation calls come in. Something has to answer that phone.",
+    role: 'The Restaurant Owner',
+    image: '/images/personas/restaurant.jpg',
+    tone: 'emerald',
+  },
+]
 
 export const industries = [
   { name: 'Roofers', icon: 'roof' },
