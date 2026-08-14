@@ -47,17 +47,21 @@ export type Persona = {
   id: string
   quote: string
   role: string
-  icon: string
+  image: string
   tone: 'blue' | 'emerald' | 'orange' | 'pink' | 'cyan' | 'violet'
 }
 
+/**
+ * Images are placeholders (see public/images/personas/README.md) —
+ * swap in real photos at the same paths and aspect ratio (4:5).
+ */
 export const personas: Persona[] = [
   {
     id: 'roofer',
     quote:
       "I'm on a roof all day. Every missed call is a job I just handed to the competitor down the street.",
     role: 'The Roofer',
-    icon: 'roof',
+    image: '/images/personas/roofer.jpg',
     tone: 'orange',
   },
   {
@@ -65,7 +69,7 @@ export const personas: Persona[] = [
     quote:
       "Between appointments I don't have three free minutes, let alone time to post on social media every day.",
     role: 'The Salon Owner',
-    icon: 'scissors',
+    image: '/images/personas/salon.jpg',
     tone: 'pink',
   },
   {
@@ -73,7 +77,7 @@ export const personas: Persona[] = [
     quote:
       "I've got two guys and a truck. I don't have a marketing department, and I don't want one.",
     role: 'The Plumber',
-    icon: 'wrench',
+    image: '/images/personas/plumber.jpg',
     tone: 'blue',
   },
   {
@@ -81,7 +85,7 @@ export const personas: Persona[] = [
     quote:
       "My front desk is already juggling patients in the chair. They can't also be chasing down every missed call.",
     role: 'The Office Manager',
-    icon: 'tooth',
+    image: '/images/personas/dentist.jpg',
     tone: 'cyan',
   },
   {
@@ -89,7 +93,7 @@ export const personas: Persona[] = [
     quote:
       "Leads go cold in an hour. If I'm mid-showing, that's an hour someone else's agent is talking to my buyer.",
     role: 'The Real Estate Agent',
-    icon: 'building',
+    image: '/images/personas/realtor.jpg',
     tone: 'violet',
   },
   {
@@ -97,7 +101,7 @@ export const personas: Persona[] = [
     quote:
       "I'm running the kitchen at 6pm when the reservation calls come in. Something has to answer that phone.",
     role: 'The Restaurant Owner',
-    icon: 'leaf',
+    image: '/images/personas/restaurant.jpg',
     tone: 'emerald',
   },
 ]

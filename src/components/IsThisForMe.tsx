@@ -1,6 +1,5 @@
 import { personas } from '../data'
 import { useReveal } from '../hooks/useReveal'
-import { IndustryIcon } from './Icons'
 
 export function IsThisForMe() {
   const { ref, className } = useReveal<HTMLElement>()
@@ -21,10 +20,13 @@ export function IsThisForMe() {
               key={persona.id}
               className={`persona-card persona-card--${persona.tone}`}
             >
-              <IndustryIcon
-                name={persona.icon}
-                className="persona-card__watermark"
+              <img
+                className="persona-card__photo"
+                src={persona.image}
+                alt=""
+                loading="lazy"
               />
+              <div className="persona-card__scrim" aria-hidden="true" />
               <span className="persona-card__quote-mark" aria-hidden="true">
                 &ldquo;
               </span>
