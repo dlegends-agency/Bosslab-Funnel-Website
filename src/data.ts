@@ -1,44 +1,132 @@
 export const painPointsLeft = [
-  'Missed calls become lost customers',
-  'Leads go unanswered',
-  'Hiring staff is expensive',
+  'Someone calls while you are helping another customer.',
+  'A lead contacts you after hours.',
 ] as const
 
 export const painPointsRight = [
-  'Social media is inconsistent',
-  'Marketing takes too much time',
-  'Too many tools to manage',
+  'A customer wants to book an appointment while your team is busy.',
+  'A follow-up gets forgotten.',
 ] as const
 
 export const traditionalHiring = [
-  'Hire Employees',
-  'Monthly Salaries',
-  'Training Required',
-  'Fixed Work Hours',
-  'Multiple Tools',
+  'Missed calls',
+  'Unanswered leads',
+  'Manual follow-ups',
+  'Appointment back-and-forth',
+  'Scattered customer information',
+  'Inconsistent marketing',
+  'Repetitive admin work',
+  'Too many disconnected tools',
 ] as const
 
 export const bossLabBenefits = [
-  'Start In Minutes',
-  'One Subscription',
-  'Ready To Use',
-  'Available Around The Clock',
-  'One Platform',
+  'Calls answered',
+  'Leads captured',
+  'Appointments booked',
+  'Follow-ups automated',
+  'Customer information organized',
+  'Marketing supported',
+  'Payments managed',
+  'AI agents working around the clock',
 ] as const
 
 export const industries = [
-  { name: 'Roofers', icon: 'roof' },
-  { name: 'Plumbers', icon: 'wrench' },
-  { name: 'Electricians', icon: 'bolt' },
-  { name: 'Dentists', icon: 'tooth' },
-  { name: 'HVAC', icon: 'fan' },
-  { name: 'Auto Repair', icon: 'car' },
-  { name: 'Landscapers', icon: 'leaf' },
-  { name: 'Cleaners', icon: 'sparkle' },
-  { name: 'Real Estate', icon: 'building' },
-  { name: 'Accountants', icon: 'calculator' },
-  { name: 'Salons', icon: 'scissors' },
-  { name: 'Pest Control', icon: 'bug' },
+  {
+    name: 'Dental Clinics',
+    icon: 'tooth',
+    color: '#2f6fed',
+    description: 'Answer patient calls and help book appointments.',
+  },
+  {
+    name: 'Medical Practices',
+    icon: 'medical',
+    color: '#e14361',
+    description: 'Handle inquiries, bookings and patient follow-ups.',
+  },
+  {
+    name: 'Salons',
+    icon: 'scissors',
+    color: '#8b5cf6',
+    description: 'Manage appointments and customer inquiries.',
+  },
+  {
+    name: 'Barbershops',
+    icon: 'comb',
+    color: '#4c5fd6',
+    description: 'Book appointments and answer customer calls.',
+  },
+  {
+    name: 'Spas',
+    icon: 'droplet',
+    color: '#ec6fa5',
+    description: 'Schedule treatments and follow up with clients.',
+  },
+  {
+    name: 'Cleaning Companies',
+    icon: 'sparkle',
+    color: '#22b573',
+    description: 'Capture new inquiries and schedule jobs.',
+  },
+  {
+    name: 'HVAC Companies',
+    icon: 'fan',
+    color: '#2f9fed',
+    description: 'Capture service requests and schedule appointments.',
+  },
+  {
+    name: 'Plumbers',
+    icon: 'wrench',
+    color: '#2f6fed',
+    description: 'Answer calls and book service jobs.',
+  },
+  {
+    name: 'Electricians',
+    icon: 'bolt',
+    color: '#f0b429',
+    description: 'Handle inquiries and schedule on-site visits.',
+  },
+  {
+    name: 'Contractors',
+    icon: 'hardhat',
+    color: '#f0862f',
+    description: 'Capture leads and manage project inquiries.',
+  },
+  {
+    name: 'Auto Repair Shops',
+    icon: 'car',
+    color: '#3b82f6',
+    description: 'Book service appointments and follow up with customers.',
+  },
+  {
+    name: 'Real Estate Businesses',
+    icon: 'building',
+    color: '#16a34a',
+    description: 'Respond to leads and keep follow-ups moving.',
+  },
+  {
+    name: 'Legal Offices',
+    icon: 'gavel',
+    color: '#7c5cff',
+    description: 'Answer client inquiries and schedule consultations.',
+  },
+  {
+    name: 'Restaurants',
+    icon: 'utensils',
+    color: '#f2994a',
+    description: 'Take reservations and manage customer inquiries.',
+  },
+  {
+    name: 'Home Service Businesses',
+    icon: 'house',
+    color: '#14b8a6',
+    description: 'Capture leads and schedule service calls.',
+  },
+  {
+    name: 'Professional Services',
+    icon: 'briefcase',
+    color: '#9333ea',
+    description: 'Manage inquiries and book appointments.',
+  },
 ] as const
 
 export type FeatureValue = string | boolean

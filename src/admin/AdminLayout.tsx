@@ -3,6 +3,21 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { adminPassword, isAdminAuthed, setAdminAuthed } from '../lib/adminAuth'
 import './admin.css'
 
+const NAV_ITEMS: {
+  to: string
+  label: string
+  icon: string
+  end?: boolean
+}[] = [
+  { to: '/admin', label: 'Dashboard', end: true, icon: 'dashboard' },
+  { to: '/admin/contacts', label: 'Contacts', icon: 'contacts' },
+  { to: '/admin/lists', label: 'Lists', icon: 'lists' },
+  { to: '/admin/tags', label: 'Tags', icon: 'tags' },
+  { to: '/admin/automations', label: 'Automations', icon: 'automations' },
+  { to: '/admin/email-test', label: 'Email Test', icon: 'email' },
+  { to: '/admin/settings', label: 'Settings', icon: 'settings' },
+]
+
 function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
   const [password, setPassword] = useState('')
   const [loginError, setLoginError] = useState('')
@@ -21,9 +36,10 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
   return (
     <div className="fk-login">
       <div className="fk-login__card">
+        <div className="fk-login__mark" aria-hidden="true" />
         <p className="fk-login__brand">Boss Lab CRM</p>
-        <h1>Admin</h1>
-        <p className="fk-muted">Enter the password to continue.</p>
+        <h1>Sign in</h1>
+        <p className="fk-muted">Enter your password to open the dashboard.</p>
         <form className="fk-login__form" onSubmit={handleLogin}>
           <label className="fk-field">
             <span>Password</span>
@@ -37,12 +53,16 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
           </label>
           {loginError ? <p className="fk-error">{loginError}</p> : null}
           <button type="submit" className="fk-btn fk-btn--primary">
-            Unlock dashboard
+            Sign in
           </button>
         </form>
       </div>
     </div>
   )
+}
+
+function NavIcon({ name }: { name: string }) {
+  return <span className={`fk-sideicon fk-sideicon--${name}`} aria-hidden="true" />
 }
 
 export function AdminLayout() {
@@ -68,45 +88,53 @@ export function AdminLayout() {
   return (
     <div className={`fk-app${isBuilder ? ' is-builder' : ''}`}>
       {!isBuilder ? (
-        <header className="fk-topnav">
-          <div className="fk-topnav__brand">Boss Lab</div>
-          <nav className="fk-topnav__links">
-            <NavLink to="/admin" end className={navClass}>
-              Dashboard
-            </NavLink>
-            <NavLink to="/admin/contacts" className={navClass}>
-              Contacts
-            </NavLink>
-            <NavLink to="/admin/lists" className={navClass}>
-              Lists
-            </NavLink>
-            <NavLink to="/admin/tags" className={navClass}>
-              Tags
-            </NavLink>
-            <NavLink to="/admin/automations" className={navClass}>
-              Automations
-            </NavLink>
-            <NavLink to="/admin/email-test" className={navClass}>
-              Email Test
-            </NavLink>
-            <NavLink to="/admin/settings" className={navClass}>
-              Settings
-            </NavLink>
+        <aside className="fk-sidebar">
+          <div className="fk-sidebar__brand">
+            <span className="fk-sidebar__logo" aria-hidden="true" />
+            <strong>BOSS LAB AI</strong>
+          </div>
+
+          <nav className="fk-sidebar__nav">
+            {NAV_ITEMS.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.end}
+                className={navClass}
+              >
+                <NavIcon name={item.icon} />
+                {item.label}
+              </NavLink>
+            ))}
           </nav>
-          <button type="button" className="fk-btn fk-btn--ghost" onClick={handleLogout}>
-            Lock
-          </button>
-        </header>
+
+          <div className="fk-sidebar__footer">
+            <button type="button" className="fk-sidebar__signout" onClick={handleLogout}>
+              <span className="fk-sideicon fk-sideicon--signout" aria-hidden="true" />
+              Sign Out
+            </button>
+            <div className="fk-sidebar__user">
+              <span className="fk-sidebar__avatar">A</span>
+              <div>
+                <strong>Admin</strong>
+                <span>Owner</span>
+              </div>
+            </div>
+          </div>
+        </aside>
       ) : null}
-      <main className={isBuilder ? 'fk-main fk-main--builder' : 'fk-main'}>
-        <Outlet />
-      </main>
+
+      <div className="fk-shell">
+        <main className={isBuilder ? 'fk-main fk-main--builder' : 'fk-main'}>
+          <Outlet />
+        </main>
+      </div>
     </div>
   )
 }
 
 function navClass({ isActive }: { isActive: boolean }) {
-  return isActive ? 'fk-navlink is-active' : 'fk-navlink'
+  return isActive ? 'fk-sidenav is-active' : 'fk-sidenav'
 }
 
 export function AdminPageShell({
@@ -114,12 +142,18 @@ export function AdminPageShell({
   count,
   actions,
   children,
+  bare,
 }: {
   title: string
   count?: number
   actions?: ReactNode
   children: ReactNode
+  bare?: boolean
 }) {
+  if (bare) {
+    return <div className="fk-page fk-page--bare">{children}</div>
+  }
+
   return (
     <div className="fk-page">
       <div className="fk-page__header">

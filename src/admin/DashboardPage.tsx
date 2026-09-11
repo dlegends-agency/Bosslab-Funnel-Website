@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { TRIGGER_LABELS } from './automationCatalog'
 import { AdminPageShell } from './AdminLayout'
@@ -10,6 +10,11 @@ type DashboardStats = {
   smsSent: number
   orders: number
   revenue: number
+  automations: number
+  activeAutomations: number
+  runs: number
+  completed: number
+  failed: number
 }
 
 type RecentContact = Contact & { activity: string }
@@ -18,10 +23,7 @@ type TopAutomation = Automation & {
   runs: number
   completed: number
   failed: number
-  revenue: number
 }
-
-type DayPoint = { label: string; contacts: number; revenue: number }
 
 function formatCompact(value: number) {
   return new Intl.NumberFormat('en-US', {
@@ -49,14 +51,25 @@ function formatDate(value: string) {
   })
 }
 
+function relativeTime(value: string) {
+  const diff = Date.now() - new Date(value).getTime()
+  const mins = Math.floor(diff / 60000)
+  if (mins < 60) return `${Math.max(1, mins)}m ago`
+  const hours = Math.floor(mins / 60)
+  if (hours < 48) return `${hours}h ago`
+  const days = Math.floor(hours / 24)
+  return `${days}d ago`
+}
+
 function initials(name: string) {
   return (name.trim()[0] || '?').toUpperCase()
 }
 
-function startOfDay(date: Date) {
-  const next = new Date(date)
-  next.setHours(0, 0, 0, 0)
-  return next
+function greeting() {
+  const hour = new Date().getHours()
+  if (hour < 12) return 'Good Morning'
+  if (hour < 18) return 'Good Afternoon'
+  return 'Good Evening'
 }
 
 export function DashboardPage() {
@@ -68,12 +81,15 @@ export function DashboardPage() {
     smsSent: 0,
     orders: 0,
     revenue: 0,
+    automations: 0,
+    activeAutomations: 0,
+    runs: 0,
+    completed: 0,
+    failed: 0,
   })
   const [recentContacts, setRecentContacts] = useState<RecentContact[]>([])
   const [recentOrders, setRecentOrders] = useState<Contact[]>([])
-  const [allOrders, setAllOrders] = useState<Contact[]>([])
   const [topAutomations, setTopAutomations] = useState<TopAutomation[]>([])
-  const [trend, setTrend] = useState<DayPoint[]>([])
 
   const load = async () => {
     setLoading(true)
@@ -85,10 +101,7 @@ export function DashboardPage() {
       { data: runs },
       { data: logs },
     ] = await Promise.all([
-      supabase
-        .from('contacts')
-        .select('*')
-        .order('created_at', { ascending: false }),
+      supabase.from('contacts').select('*').order('created_at', { ascending: false }),
       supabase.from('automations').select('*').order('created_at', { ascending: false }),
       supabase.from('automation_runs').select('*'),
       supabase.from('automation_run_logs').select('id, message, status, created_at'),
@@ -116,19 +129,25 @@ export function DashboardPage() {
         log.message.toLowerCase().includes('email queued'),
     ).length
 
+    const completed = runRows.filter((r) => r.status === 'completed').length
+    const failed = runRows.filter((r) => r.status === 'failed').length
+
     setStats({
       contacts: contactRows.length,
       emailsSent,
       smsSent: 0,
       orders: orders.length,
       revenue,
+      automations: automationRows.length,
+      activeAutomations: automationRows.filter((a) => a.status === 'active').length,
+      runs: runRows.length,
+      completed,
+      failed,
     })
 
-    setRecentOrders(orders.slice(0, 6))
-    setAllOrders(orders)
-
+    setRecentOrders(orders.slice(0, 5))
     setRecentContacts(
-      contactRows.slice(0, 8).map((contact) => ({
+      contactRows.slice(0, 6).map((contact) => ({
         ...contact,
         activity: contact.order_plan
           ? 'placed an order'
@@ -162,37 +181,12 @@ export function DashboardPage() {
             completed: 0,
             failed: 0,
           }
-          return {
-            ...automation,
-            ...counts,
-            revenue: 0,
-          }
+          return { ...automation, ...counts }
         })
         .sort((a, b) => b.runs - a.runs)
-        .slice(0, 5),
+        .slice(0, 4),
     )
 
-    const days: DayPoint[] = []
-    for (let i = 6; i >= 0; i -= 1) {
-      const day = startOfDay(new Date())
-      day.setDate(day.getDate() - i)
-      const next = new Date(day)
-      next.setDate(next.getDate() + 1)
-      const dayContacts = contactRows.filter((c) => {
-        const created = new Date(c.created_at)
-        return created >= day && created < next
-      })
-      const dayRevenue = dayContacts.reduce(
-        (sum, c) => sum + Number(c.total_revenue ?? 0),
-        0,
-      )
-      days.push({
-        label: day.toLocaleDateString(undefined, { weekday: 'short' }),
-        contacts: dayContacts.length,
-        revenue: dayRevenue,
-      })
-    }
-    setTrend(days)
     setLoading(false)
   }
 
@@ -200,66 +194,77 @@ export function DashboardPage() {
     void load()
   }, [])
 
-  const maxContacts = useMemo(
-    () => Math.max(1, ...trend.map((point) => point.contacts)),
-    [trend],
-  )
-  const maxRevenue = useMemo(
-    () => Math.max(1, ...trend.map((point) => point.revenue)),
-    [trend],
-  )
+  const waiting = stats.failed
+  const inProgress = Math.max(0, stats.runs - stats.completed - stats.failed)
 
   const metricCards = [
     {
       key: 'contacts',
-      label: 'Contacts',
-      value: formatCompact(stats.contacts),
-      icon: 'contacts',
-      tone: 'blue',
+      label: 'Total Contacts',
+      value: loading ? '—' : formatCompact(stats.contacts),
+      sub: 'In your CRM',
+      tone: 'violet',
     },
     {
       key: 'emails',
-      label: 'Emails Sent',
-      value: formatCompact(stats.emailsSent),
-      icon: 'emails',
-      tone: 'violet',
+      label: 'Email Sent',
+      value: loading ? '—' : formatCompact(stats.emailsSent),
+      sub: 'Across all flows',
+      tone: 'blue',
     },
     {
       key: 'sms',
       label: 'SMS Sent',
-      value: formatCompact(stats.smsSent),
-      icon: 'sms',
-      tone: 'cyan',
+      value: loading ? '—' : formatCompact(stats.smsSent),
+      sub: 'Across all flows',
+      tone: 'green',
     },
     {
       key: 'orders',
       label: 'Total Orders',
-      value: formatCompact(stats.orders),
-      icon: 'orders',
+      value: loading ? '—' : formatCompact(stats.orders),
+      sub: 'Paid checkouts',
       tone: 'orange',
     },
     {
       key: 'revenue',
       label: 'Revenue',
-      value: formatMoney(stats.revenue),
-      icon: 'revenue',
-      tone: 'green',
+      value: loading ? '—' : formatMoney(stats.revenue),
+      sub: 'Total earned',
+      tone: 'cyan',
     },
   ]
 
+  const briefing = [
+    `Your automations completed ${stats.completed} runs.`,
+    `Your funnel has ${stats.contacts} contacts and ${stats.orders} orders.`,
+    `Portfolio revenue is sitting at ${formatMoney(stats.revenue)}.`,
+  ]
+
   return (
-    <AdminPageShell
-      title="Dashboard"
-      actions={
-        <button
-          type="button"
-          className="fk-btn fk-btn--ghost"
-          onClick={() => void load()}
-        >
-          ↻ Refresh
-        </button>
-      }
-    >
+    <AdminPageShell title="Dashboard" bare>
+      <header className="fk-dash-hero">
+        <div>
+          <h1>
+            {greeting()}, Admin <span aria-hidden="true">👋</span>
+          </h1>
+          <p>Here&apos;s what&apos;s happening across your funnel today.</p>
+        </div>
+        <div className="fk-dash-hero__actions">
+          <button
+            type="button"
+            className="fk-icon-btn"
+            aria-label="Refresh"
+            onClick={() => void load()}
+          >
+            ↻
+          </button>
+          <Link to="/admin/contacts" className="fk-btn fk-btn--primary">
+            + Add Contact
+          </Link>
+        </div>
+      </header>
+
       {error ? <p className="fk-error">{error}</p> : null}
 
       <section className="fk-metrics" aria-label="Overview metrics">
@@ -267,361 +272,169 @@ export function DashboardPage() {
           <article
             key={card.key}
             className={`fk-metric fk-metric--${card.tone}`}
-            style={{ animationDelay: `${index * 70}ms` }}
+            style={{ animationDelay: `${index * 60}ms` }}
           >
-            <div className={`fk-metric__icon fk-metric__icon--${card.icon}`} aria-hidden="true" />
+            <div className="fk-metric__icon" aria-hidden="true" />
             <div>
+              <p className="fk-metric__value">{card.value}</p>
               <p className="fk-metric__label">{card.label}</p>
-              <p className="fk-metric__value">
-                {loading ? '—' : card.value}
-              </p>
+              <p className="fk-metric__sub">{card.sub}</p>
             </div>
           </article>
         ))}
       </section>
 
-      <section className="fk-dash-charts">
-        <article className="fk-dash-card fk-dash-card--chart">
+      <section className="fk-dash-row">
+        <article className="fk-dash-card fk-dash-card--wide">
           <div className="fk-dash-card__head">
-            <h2>Growth (7 days)</h2>
-            <span className="fk-muted">New contacts vs revenue</span>
+            <h2>Customer Order</h2>
           </div>
-          <div className="fk-chart">
-            <svg viewBox="0 0 640 220" role="img" aria-label="7 day growth chart">
-              <defs>
-                <linearGradient id="contactFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.35" />
-                  <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.02" />
-                </linearGradient>
-                <linearGradient id="revenueStroke" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="#10b981" />
-                  <stop offset="100%" stopColor="#34d399" />
-                </linearGradient>
-              </defs>
-              {[0, 1, 2, 3].map((line) => (
-                <line
-                  key={line}
-                  x1="40"
-                  x2="620"
-                  y1={30 + line * 45}
-                  y2={30 + line * 45}
-                  className="fk-chart__grid"
-                />
-              ))}
-              {trend.length > 0 ? (
-                <>
-                  <path
-                    className="fk-chart__area"
-                    d={buildAreaPath(trend, maxContacts, 'contacts')}
-                    fill="url(#contactFill)"
-                  />
-                  <polyline
-                    className="fk-chart__line fk-chart__line--contacts"
-                    points={buildLinePoints(trend, maxContacts, 'contacts')}
-                    fill="none"
-                  />
-                  <polyline
-                    className="fk-chart__line fk-chart__line--revenue"
-                    points={buildLinePoints(trend, maxRevenue, 'revenue')}
-                    fill="none"
-                    stroke="url(#revenueStroke)"
-                  />
-                  {trend.map((point, index) => {
-                    const x = 40 + index * (580 / Math.max(trend.length - 1, 1))
-                    return (
-                      <g key={point.label}>
-                        <circle
-                          className="fk-chart__dot"
-                          cx={x}
-                          cy={190 - (point.contacts / maxContacts) * 140}
-                          r="4"
-                          style={{ animationDelay: `${index * 80}ms` }}
-                        />
-                        <text x={x} y="212" textAnchor="middle" className="fk-chart__label">
-                          {point.label}
-                        </text>
-                      </g>
-                    )
-                  })}
-                </>
-              ) : null}
-            </svg>
-            <div className="fk-chart__legend">
-              <span>
-                <i className="is-contacts" /> Contacts
-              </span>
-              <span>
-                <i className="is-revenue" /> Revenue
-              </span>
+          {loading ? (
+            <p className="fk-muted">Loading…</p>
+          ) : recentOrders.length === 0 ? (
+            <p className="fk-muted">No purchases yet.</p>
+          ) : (
+            <div className="fk-table-wrap">
+              <table className="fk-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Plan</th>
+                    <th>Created On</th>
+                    <th>Revenue</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentOrders.map((order, index) => (
+                    <tr
+                      key={order.id}
+                      className="fk-row-animate"
+                      style={{ animationDelay: `${index * 60}ms` }}
+                    >
+                      <td>
+                        <Link
+                          className="fk-contact-link"
+                          to={`/admin/contacts/${order.id}`}
+                        >
+                          <span className="fk-avatar">
+                            {initials(order.first_name)}
+                          </span>
+                          {order.first_name}
+                        </Link>
+                      </td>
+                      <td>{order.email}</td>
+                      <td>
+                        <span className="fk-status fk-status--ok">
+                          {order.order_plan || 'Paid'}
+                        </span>
+                      </td>
+                      <td>{formatDate(order.created_at)}</td>
+                      <td>
+                        <span className="fk-revenue">
+                          {formatMoney(Number(order.total_revenue ?? 0))}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          </div>
+          )}
+          <Link className="fk-dash-card__footer-link" to="/admin/contacts">
+            View All Contacts →
+          </Link>
         </article>
 
-        <article className="fk-dash-card fk-dash-card--donut">
+        <article className="fk-dash-card">
           <div className="fk-dash-card__head">
-            <h2>Order Mix</h2>
-            <span className="fk-muted">Plans purchased</span>
+            <h2>Recent Activity</h2>
           </div>
-          <PlanMixChart orders={allOrders} />
+          {loading ? (
+            <p className="fk-muted">Loading…</p>
+          ) : recentContacts.length === 0 ? (
+            <p className="fk-muted">No contacts yet.</p>
+          ) : (
+            <ul className="fk-activity-feed">
+              {recentContacts.map((contact) => (
+                <li key={contact.id}>
+                  <span className="fk-activity-feed__icon" aria-hidden="true" />
+                  <div>
+                    <strong>
+                      <Link to={`/admin/contacts/${contact.id}`}>
+                        {contact.first_name}
+                      </Link>
+                    </strong>
+                    <p>{contact.activity}</p>
+                  </div>
+                  <time>{relativeTime(contact.created_at)}</time>
+                </li>
+              ))}
+            </ul>
+          )}
         </article>
       </section>
 
-      <div className="fk-dash-grid">
-        <div className="fk-dash-main">
-          <section className="fk-dash-card">
-            <div className="fk-dash-card__head">
-              <h2>Recent Orders</h2>
-              <Link to="/admin/contacts">View Contacts →</Link>
+      <section className="fk-dash-row">
+        <article className="fk-dash-card">
+          <div className="fk-dash-card__head">
+            <h2>Automation Center</h2>
+          </div>
+          <div className="fk-mission-grid">
+            <div className="fk-mission-tile fk-mission-tile--warn">
+              <span className="fk-mission-tile__icon" aria-hidden="true" />
+              <strong>{loading ? '—' : waiting}</strong>
+              <span>Needs Attention</span>
             </div>
-            {loading ? (
-              <p className="fk-muted">Loading…</p>
-            ) : recentOrders.length === 0 ? (
-              <p className="fk-muted">No purchases yet.</p>
-            ) : (
-              <div className="fk-table-wrap">
-                <table className="fk-table">
-                  <thead>
-                    <tr>
-                      <th>Contact</th>
-                      <th>Details</th>
-                      <th>Status</th>
-                      <th>Created On</th>
-                      <th>Revenue</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {recentOrders.map((order, index) => (
-                      <tr
-                        key={order.id}
-                        className="fk-row-animate"
-                        style={{ animationDelay: `${index * 60}ms` }}
-                      >
-                        <td>
-                          <Link
-                            className="fk-contact-link"
-                            to={`/admin/contacts/${order.id}`}
-                          >
-                            <span className="fk-avatar">
-                              {initials(order.first_name)}
-                            </span>
-                            {order.first_name}
-                          </Link>
-                        </td>
-                        <td>{order.email}</td>
-                        <td>
-                          <span className="fk-status fk-status--ok">
-                            {order.order_plan || 'Paid'}
-                          </span>
-                        </td>
-                        <td>{formatDate(order.created_at)}</td>
-                        <td>
-                          <span className="fk-revenue">
-                            {formatMoney(Number(order.total_revenue ?? 0))}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
+            <div className="fk-mission-tile fk-mission-tile--progress">
+              <span className="fk-mission-tile__icon" aria-hidden="true" />
+              <strong>{loading ? '—' : inProgress}</strong>
+              <span>In Progress</span>
+            </div>
+            <div className="fk-mission-tile fk-mission-tile--done">
+              <span className="fk-mission-tile__icon" aria-hidden="true" />
+              <strong>{loading ? '—' : stats.completed}</strong>
+              <span>Completed</span>
+            </div>
+            <div className="fk-mission-tile fk-mission-tile--total">
+              <span className="fk-mission-tile__icon" aria-hidden="true" />
+              <strong>{loading ? '—' : stats.runs}</strong>
+              <span>Total Runs</span>
+            </div>
+          </div>
+          {topAutomations.length > 0 ? (
+            <ul className="fk-auto-mini">
+              {topAutomations.map((automation) => (
+                <li key={automation.id}>
+                  <Link to={`/admin/automations/${automation.id}`}>
+                    {automation.name}
+                  </Link>
+                  <span>
+                    {TRIGGER_LABELS[automation.trigger_type] ?? automation.trigger_type}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </article>
 
-          <section className="fk-dash-card">
-            <div className="fk-dash-card__head">
-              <h2>Top Automations</h2>
-              <Link to="/admin/automations">View Automations →</Link>
-            </div>
-            {loading ? (
-              <p className="fk-muted">Loading…</p>
-            ) : topAutomations.length === 0 ? (
-              <p className="fk-muted">No automations yet.</p>
-            ) : (
-              <div className="fk-table-wrap">
-                <table className="fk-table">
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Event</th>
-                      <th>Contact Activity</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {topAutomations.map((automation, index) => (
-                      <tr
-                        key={automation.id}
-                        className="fk-row-animate"
-                        style={{ animationDelay: `${index * 60}ms` }}
-                      >
-                        <td>
-                          <Link to={`/admin/automations/${automation.id}`}>
-                            {automation.name}
-                          </Link>
-                        </td>
-                        <td>
-                          {TRIGGER_LABELS[automation.trigger_type] ??
-                            automation.trigger_type}
-                        </td>
-                        <td>
-                          <div className="fk-activity">
-                            <span title="Runs" className="fk-activity__chip">
-                              <i className="is-runs" /> {automation.runs}
-                            </span>
-                            <span title="Completed" className="fk-activity__chip">
-                              <i className="is-ok" /> {automation.completed}
-                            </span>
-                            <span title="Failed" className="fk-activity__chip">
-                              <i className="is-fail" /> {automation.failed}
-                            </span>
-                          </div>
-                        </td>
-                        <td>
-                          <span
-                            className={
-                              automation.status === 'active'
-                                ? 'fk-badge fk-badge--success'
-                                : 'fk-badge fk-badge--danger'
-                            }
-                          >
-                            {automation.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
-        </div>
-
-        <aside className="fk-dash-side">
-          <section className="fk-dash-card">
-            <div className="fk-dash-card__head">
-              <h2>Recent Contacts</h2>
-            </div>
-            {loading ? (
-              <p className="fk-muted">Loading…</p>
-            ) : recentContacts.length === 0 ? (
-              <p className="fk-muted">No contacts yet.</p>
-            ) : (
-              <ul className="fk-feed">
-                {recentContacts.map((contact, index) => (
-                  <li
-                    key={contact.id}
-                    className="fk-feed__item"
-                    style={{ animationDelay: `${index * 70}ms` }}
-                  >
-                    <span className="fk-avatar">{initials(contact.first_name)}</span>
-                    <div>
-                      <p>
-                        <Link to={`/admin/contacts/${contact.id}`}>
-                          {contact.first_name}
-                        </Link>{' '}
-                        {contact.activity}
-                      </p>
-                      <time>{formatDate(contact.created_at)}</time>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-        </aside>
-      </div>
+        <article className="fk-dash-card fk-dash-card--briefing">
+          <div className="fk-dash-card__head">
+            <h2>Today&apos;s Executive Briefing</h2>
+          </div>
+          <ul className="fk-briefing">
+            {briefing.map((line) => (
+              <li key={line}>
+                <span aria-hidden="true" />
+                {line}
+              </li>
+            ))}
+          </ul>
+          <Link to="/admin/automations" className="fk-btn fk-btn--primary fk-btn--block">
+            View Full Briefing →
+          </Link>
+        </article>
+      </section>
     </AdminPageShell>
-  )
-}
-
-function buildLinePoints(
-  points: DayPoint[],
-  max: number,
-  key: 'contacts' | 'revenue',
-) {
-  return points
-    .map((point, index) => {
-      const x = 40 + index * (580 / Math.max(points.length - 1, 1))
-      const y = 190 - (point[key] / max) * 140
-      return `${x},${y}`
-    })
-    .join(' ')
-}
-
-function buildAreaPath(
-  points: DayPoint[],
-  max: number,
-  key: 'contacts' | 'revenue',
-) {
-  if (!points.length) return ''
-  const line = buildLinePoints(points, max, key)
-  const firstX = 40
-  const lastX = 40 + (points.length - 1) * (580 / Math.max(points.length - 1, 1))
-  return `M ${firstX} 190 L ${line.replace(/ /g, ' L ')} L ${lastX} 190 Z`
-}
-
-function PlanMixChart({ orders }: { orders: Contact[] }) {
-  const mix = useMemo(() => {
-    const counts = new Map<string, number>()
-    for (const contact of orders) {
-      const plan = contact.order_plan || 'Unknown'
-      counts.set(plan, (counts.get(plan) ?? 0) + 1)
-    }
-    const colors = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b']
-    return [...counts.entries()].map(([label, value], index) => ({
-      label,
-      value,
-      color: colors[index % colors.length],
-    }))
-  }, [orders])
-
-  const total = Math.max(
-    1,
-    mix.reduce((sum, item) => sum + item.value, 0),
-  )
-
-  let offset = 0
-  const segments = mix.map((item) => {
-    const length = (item.value / total) * 100
-    const segment = { ...item, offset, length }
-    offset += length
-    return segment
-  })
-
-  return (
-    <div className="fk-donut">
-      <div
-        className="fk-donut__ring"
-        style={{
-          background:
-            segments.length === 0
-              ? '#e5e7eb'
-              : `conic-gradient(${segments
-                  .map(
-                    (segment) =>
-                      `${segment.color} ${segment.offset}% ${segment.offset + segment.length}%`,
-                  )
-                  .join(', ')})`,
-        }}
-      >
-        <div className="fk-donut__hole">
-          <strong>{orders.length}</strong>
-          <span>Orders</span>
-        </div>
-      </div>
-      <ul className="fk-donut__legend">
-        {segments.length === 0 ? (
-          <li className="fk-muted">No plan data yet</li>
-        ) : (
-          segments.map((segment) => (
-            <li key={segment.label}>
-              <i style={{ background: segment.color }} />
-              <span>{segment.label}</span>
-              <strong>{segment.value}</strong>
-            </li>
-          ))
-        )}
-      </ul>
-    </div>
   )
 }

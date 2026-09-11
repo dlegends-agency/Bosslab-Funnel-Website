@@ -22,6 +22,13 @@ export type Contact = {
   company: string
   gender: string
   date_of_birth: string
+  business_niche: string
+  business_goal: string
+  business_website: string
+  business_location: string
+  business_goals: string[]
+  onboarding_step: number
+  onboarded_at: string | null
   created_at: string
   updated_at: string
 }
@@ -57,6 +64,8 @@ export type AutomationTrigger =
   | 'unset'
   | 'form_submit'
   | 'stripe_purchase'
+  | 'order_created'
+  | 'order_created_per_product'
   | 'tag_added'
   | 'tag_removed'
   | 'added_to_list'
@@ -73,20 +82,57 @@ export type ActionType =
   | 'zapier_webhook'
   | 'send_email'
 
+export type OrderContainsMode = 'any' | 'specific' | 'category'
+
+export type OrderRunFrequency = 'once' | 'multiple'
+
+export type OrderStatusOption =
+  | 'completed'
+  | 'draft'
+  | 'on_hold'
+  | 'processing'
+
+export type EntityContainsMode = 'any' | 'specific'
+
+export type AutomationTriggerConfig = {
+  order_statuses?: OrderStatusOption[]
+  order_contains?: OrderContainsMode
+  product_ids?: string[]
+  run_frequency?: OrderRunFrequency
+  webhook_key?: string
+  last_received_at?: string
+  last_payload?: Record<string, unknown> | null
+  entity_contains?: EntityContainsMode
+  tag_ids?: string[]
+  list_ids?: string[]
+}
+
 export type Automation = {
   id: string
   name: string
   trigger_type: AutomationTrigger
+  trigger_config: AutomationTriggerConfig
   status: AutomationStatus
   created_at: string
   updated_at: string
 }
 
+export type AutomationStepType =
+  | 'action'
+  | 'delay'
+  | 'condition'
+  | 'split_path'
+  | 'goal'
+  | 'jump'
+  | 'exit'
+
+export type DelayUnit = 'minutes' | 'hours' | 'days' | 'weeks'
+
 export type AutomationStep = {
   id: string
   automation_id: string
   position: number
-  step_type: 'action' | 'delay'
+  step_type: AutomationStepType
   action_type: ActionType | null
   config: {
     list_id?: string
@@ -95,6 +141,20 @@ export type AutomationStep = {
     email_subject?: string
     email_body?: string
     delay_days?: number
+    delay_mode?: 'period' | 'datetime' | 'custom_field'
+    delay_amount?: number
+    delay_unit?: DelayUnit
+    delay_until_time?: boolean
+    delay_until_weekday?: boolean
+    delay_datetime?: string
+    delay_custom_field?: string
+    condition_category?: string
+    condition_label?: string
+    condition_categories?: string[]
+    goal_name?: string
+    jump_to_position?: number
+    split_percent?: number
+    exit_reason?: string
   }
   created_at: string
 }

@@ -6,7 +6,13 @@ export function Footer() {
   return (
     <footer className="footer">
       <div className="footer__inner section-inner">
-        <p className="footer__brand">Boss Lab AI</p>
+        <img
+          className="footer__brand"
+          src="/images/bosslabai-logo.png"
+          alt="Boss Lab AI"
+          width={2048}
+          height={682}
+        />
 
         <nav className="footer__links" aria-label="Legal">
           <Link to="/privacy-policy">Privacy Policy</Link>

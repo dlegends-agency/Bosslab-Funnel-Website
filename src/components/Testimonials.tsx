@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 import { testimonialsRowA, testimonialsRowB, type Testimonial } from '../data'
 import { useReveal } from '../hooks/useReveal'
+import { Starfield } from './Starfield'
 
 const MARQUEE_SEGMENTS = 6
 
@@ -60,9 +61,10 @@ export function Testimonials() {
   return (
     <section
       ref={ref}
-      className={`section testimonials reveal ${className}`}
+      className={`section testimonials has-starfield reveal ${className}`}
       aria-labelledby="testimonials-heading"
     >
+      <Starfield />
       <div className="section-inner">
         <h2 id="testimonials-heading" className="section-title">
           Trusted by Local <span className="accent">Business Owners</span>

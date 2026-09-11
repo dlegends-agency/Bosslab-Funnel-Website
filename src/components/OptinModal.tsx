@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { industries } from '../data'
 import { runFormSubmitAutomations } from '../lib/automationEngine'
 import { supabase, type Contact } from '../lib/supabase'
 import { trackLead } from '../lib/tracking'
@@ -10,13 +10,14 @@ type OptinModalProps = {
 }
 
 export function OptinModal({ open, onClose }: OptinModalProps) {
-  const navigate = useNavigate()
   const titleId = useId()
   const firstInputRef = useRef<HTMLInputElement>(null)
-  const [firstName, setFirstName] = useState('')
-  const [email, setEmail] = useState('')
+  const [businessName, setBusinessName] = useState('')
+  const [businessEmail, setBusinessEmail] = useState('')
+  const [businessType, setBusinessType] = useState('')
   const [phone, setPhone] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -44,9 +45,11 @@ export function OptinModal({ open, onClose }: OptinModalProps) {
     if (!open) {
       const resetTimer = window.setTimeout(() => {
         setSubmitting(false)
+        setSubmitted(false)
         setError('')
-        setFirstName('')
-        setEmail('')
+        setBusinessName('')
+        setBusinessEmail('')
+        setBusinessType('')
         setPhone('')
       }, 220)
       return () => window.clearTimeout(resetTimer)
@@ -60,14 +63,16 @@ export function OptinModal({ open, onClose }: OptinModalProps) {
     setError('')
     setSubmitting(true)
 
-    const trimmedName = firstName.trim()
-    const trimmedEmail = email.trim().toLowerCase()
+    const trimmedName = businessName.trim()
+    const trimmedEmail = businessEmail.trim().toLowerCase()
     const trimmedPhone = phone.trim()
 
     const payload = {
       first_name: trimmedName,
+      company: trimmedName,
       email: trimmedEmail,
       phone: trimmedPhone,
+      business_niche: businessType,
       status: 'subscribed' as const,
       updated_at: new Date().toISOString(),
     }
@@ -90,16 +95,10 @@ export function OptinModal({ open, onClose }: OptinModalProps) {
       console.error('Automation run failed', automationError)
     }
 
-    void trackLead({ content_name: 'Opt-in Form' })
+    void trackLead({ content_name: 'Waitlist Popup' })
 
-    const query = new URLSearchParams({
-      email: trimmedEmail,
-      name: trimmedName,
-      contact: contact.id,
-    })
-
-    onClose()
-    navigate(`/checkout?${query.toString()}`)
+    setSubmitting(false)
+    setSubmitted(true)
   }
 
   return (
@@ -128,75 +127,100 @@ export function OptinModal({ open, onClose }: OptinModalProps) {
         </button>
 
         <p className="optin-brand">Boss Lab AI</p>
-        <p className="optin-kicker">You&apos;re just one step away!</p>
+        <p className="optin-kicker">Be part of what&apos;s next!</p>
         <h2 id={titleId} className="optin-title">
-          Start your <span className="accent">AI team</span> today
+          Join The BossLab AI <span className="accent">Waitlist</span>
         </h2>
         <p className="optin-sub">
-          Enter your details below and we&apos;ll get you signed up.
+          Fill out the form below and be the first to know when we launch.
         </p>
 
-        <form className="optin-form" onSubmit={handleSubmit}>
-          <label className="optin-field">
-            <span>
-              First Name<span className="req">*</span>
-            </span>
-            <input
-              ref={firstInputRef}
-              type="text"
-              name="firstName"
-              placeholder="Your first name"
-              value={firstName}
-              onChange={(event) => setFirstName(event.target.value)}
-              required
-              autoComplete="given-name"
-              disabled={submitting}
-            />
-          </label>
+        {submitted ? (
+          <p className="optin-success">
+            You&apos;re on the list! We&apos;ll be in touch soon.
+          </p>
+        ) : (
+          <form className="optin-form" onSubmit={handleSubmit}>
+            <label className="optin-field">
+              <span>
+                Business Name<span className="req">*</span>
+              </span>
+              <input
+                ref={firstInputRef}
+                type="text"
+                name="businessName"
+                placeholder="Your business name"
+                value={businessName}
+                onChange={(event) => setBusinessName(event.target.value)}
+                required
+                autoComplete="organization"
+                disabled={submitting}
+              />
+            </label>
 
-          <label className="optin-field">
-            <span>
-              Email<span className="req">*</span>
-            </span>
-            <input
-              type="email"
-              name="email"
-              placeholder="you@business.com"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              required
-              autoComplete="email"
-              disabled={submitting}
-            />
-          </label>
+            <label className="optin-field">
+              <span>
+                Business Email<span className="req">*</span>
+              </span>
+              <input
+                type="email"
+                name="businessEmail"
+                placeholder="you@business.com"
+                value={businessEmail}
+                onChange={(event) => setBusinessEmail(event.target.value)}
+                required
+                autoComplete="email"
+                disabled={submitting}
+              />
+            </label>
 
-          <label className="optin-field">
-            <span>
-              Phone<span className="req">*</span>
-            </span>
-            <input
-              type="tel"
-              name="phone"
-              placeholder="+1 555 000 0000"
-              value={phone}
-              onChange={(event) => setPhone(event.target.value)}
-              required
-              autoComplete="tel"
-              disabled={submitting}
-            />
-          </label>
+            <label className="optin-field">
+              <span>
+                Business Type<span className="req">*</span>
+              </span>
+              <select
+                name="businessType"
+                value={businessType}
+                onChange={(event) => setBusinessType(event.target.value)}
+                required
+                disabled={submitting}
+              >
+                <option value="" disabled>
+                  Select your business type
+                </option>
+                {industries.map((industry) => (
+                  <option key={industry.name} value={industry.name}>
+                    {industry.name}
+                  </option>
+                ))}
+                <option value="Other">Other</option>
+              </select>
+            </label>
 
-          {error ? <p className="optin-error">{error}</p> : null}
+            <label className="optin-field">
+              <span>
+                Phone Number<span className="req">*</span>
+              </span>
+              <input
+                type="tel"
+                name="phone"
+                placeholder="+1 555 000 0000"
+                value={phone}
+                onChange={(event) => setPhone(event.target.value)}
+                required
+                autoComplete="tel"
+                disabled={submitting}
+              />
+            </label>
 
-          <button
-            type="submit"
-            className="optin-submit"
-            disabled={submitting}
-          >
-            <span>{submitting ? 'Submitting…' : 'Yes! Start My Own Team'}</span>
-            <span className="optin-submit__shine" aria-hidden="true" />
-          </button>
-        </form>
+            {error ? <p className="optin-error">{error}</p> : null}
+
+            <button type="submit" className="optin-submit" disabled={submitting}>
+              <span>{submitting ? 'Reserving…' : 'Reserve My Spot'}</span>
+              <span className="optin-submit__shine" aria-hidden="true" />
+            </button>
+          </form>
+        )}
 
         <p className="optin-secure">
           <svg
@@ -209,7 +233,7 @@ export function OptinModal({ open, onClose }: OptinModalProps) {
               d="M12 1a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5zm-3 8V6a3 3 0 1 1 6 0v3H9zm3 4a1.5 1.5 0 0 1 .75 2.8V18h-1.5v-2.2A1.5 1.5 0 0 1 12 13z"
             />
           </svg>
-          Your information is 100% secure
+          No spam. We will only send important BossLab AI updates.
         </p>
       </div>
     </div>

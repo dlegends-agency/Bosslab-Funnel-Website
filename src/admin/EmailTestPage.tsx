@@ -32,7 +32,7 @@ export function EmailTestPage() {
 
     const { data, error: fnError } = await supabase.functions.invoke('send-email', {
       body: {
-        from: 'onboarding@resend.dev',
+        from: 'support@bosslabai.pages.dev',
         to: to.trim(),
         subject: subject.trim(),
         html: html.trim(),
@@ -138,7 +138,8 @@ export function EmailTestPage() {
               ).
             </li>
             <li>
-              From address defaults to <code>onboarding@resend.dev</code>.
+              From address defaults to{' '}
+              <code>support@bosslabai.pages.dev</code>.
             </li>
             <li>
               With Resend&apos;s test domain, send only to the email on your
