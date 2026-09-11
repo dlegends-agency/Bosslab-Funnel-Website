@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, Navigate, useSearchParams } from 'react-router-dom'
 import {
   checkoutPlans,
   formatFeatureValue,
@@ -174,9 +174,8 @@ export function CheckoutSuccessPage() {
   const [params] = useSearchParams()
   const plan = params.get('plan')
   const contactId = params.get('contact')
-  const planLabel = plan
-    ? plan.charAt(0).toUpperCase() + plan.slice(1)
-    : null
+
+  const [destination, setDestination] = useState<string | null>(null)
 
   useEffect(() => {
     if (!contactId) return
@@ -212,7 +211,13 @@ export function CheckoutSuccessPage() {
         .eq('id', contactId)
         .maybeSingle()
       if (cancelled || !data) return
-      await runStripePurchaseAutomations(data as Contact)
+      const loadedContact = data as Contact
+      setDestination(
+        loadedContact.onboarded_at
+          ? `/mission-control?contact=${contactId}`
+          : `/onboarding?contact=${contactId}`,
+      )
+      await runStripePurchaseAutomations(loadedContact)
     }
 
     void run()
@@ -220,6 +225,21 @@ export function CheckoutSuccessPage() {
       cancelled = true
     }
   }, [contactId, plan])
+
+  if (contactId && destination) {
+    return <Navigate to={destination} replace />
+  }
+
+  if (contactId) {
+    return (
+      <main className="checkout thankyou">
+        <div className="thankyou__inner">
+          <p className="checkout__brand">Boss Lab AI</p>
+          <p className="thankyou__lead">Confirming your purchase…</p>
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main className="checkout thankyou">
@@ -236,58 +256,16 @@ export function CheckoutSuccessPage() {
           Congratulations — let&apos;s work together for growth!
         </p>
         <p className="thankyou__copy">
-          Thank you for joining BOSS LAB AI
-          {planLabel ? ` on the ${planLabel} plan` : ''}. Your AI workforce is
-          being prepared, and you&apos;re one step closer to running your
-          business with smarter automation.
+          Thank you for joining BOSS LAB AI. Your AI workforce is being
+          prepared, and you&apos;re one step closer to running your business
+          with smarter automation.
         </p>
-
-        <section className="thankyou__section">
-          <h2>What Happens Next?</h2>
-          <ol className="thankyou__steps">
-            <li>
-              <strong>Check Your Email</strong>
-              <p>
-                We&apos;ve sent a confirmation email with everything you need to
-                access your account. Please check both your inbox and spam/junk
-                folder.
-              </p>
-            </li>
-            <li>
-              <strong>Access Your Dashboard</strong>
-              <p>
-                Follow the instructions in the email to sign in and start setting
-                up your AI team.
-              </p>
-            </li>
-            <li>
-              <strong>Start Your Onboarding</strong>
-              <p>
-                Once you&apos;re inside, you&apos;ll connect your business,
-                customize your AI employees, and begin automating your daily
-                operations.
-              </p>
-            </li>
-          </ol>
-        </section>
-
-        <section className="thankyou__section thankyou__section--help">
-          <h2>Didn&apos;t Receive the Email?</h2>
-          <p>
-            If you don&apos;t receive your email within 5 minutes, there is a
-            good chance the email address entered during checkout was incorrect.
-          </p>
-          <p>
-            Please contact our support team, and we&apos;ll help you right away.
-          </p>
+        <p className="thankyou__closing">
+          Please contact support if you don&apos;t hear from us shortly.
+          <br />
           <a className="thankyou__support" href="mailto:support@bosslabai.com">
             support@bosslabai.com
           </a>
-        </section>
-
-        <p className="thankyou__closing">
-          Thank you for choosing BOSS LAB AI. We&apos;re excited to help your
-          business save time, automate routine work, and grow faster.
         </p>
 
         <Link to="/" className="checkout__cta checkout__cta--link">

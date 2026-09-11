@@ -483,6 +483,80 @@
   margin-top: 1.75rem;
 }
 
+/* ——— Post-purchase onboarding form ——— */
+.onboard-form {
+  display: grid;
+  gap: 1.15rem;
+  margin-top: 2.25rem;
+  padding: 1.75rem 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  background: linear-gradient(
+    165deg,
+    rgba(28, 18, 56, 0.72),
+    rgba(8, 10, 28, 0.88)
+  );
+  text-align: left;
+}
+
+.onboard-form__field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.onboard-form__field span {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.onboard-form__field input,
+.onboard-form__field select {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font-size: 0.98rem;
+  font-family: inherit;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.onboard-form__field input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.onboard-form__field input:focus,
+.onboard-form__field select:focus {
+  outline: none;
+  border-color: rgba(174, 98, 255, 0.6);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.onboard-form__field select {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, rgba(255, 255, 255, 0.6) 50%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.6) 50%, transparent 50%);
+  background-position: calc(100% - 1.3rem) center, calc(100% - 1rem) center;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+
+.onboard-form__field select option {
+  background: #16102e;
+  color: #fff;
+}
+
+.onboard-form .checkout__error {
+  margin: 0;
+}
+
+.onboard-form .checkout__cta {
+  margin-top: 0.35rem;
+  width: 100%;
+}
+
 @media (max-width: 1024px) {
   .checkout__grid {
     grid-template-columns: 1fr;

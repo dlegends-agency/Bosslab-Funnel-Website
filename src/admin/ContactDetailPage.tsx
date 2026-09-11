@@ -192,6 +192,11 @@ export function ContactDetailPage() {
       company: (contactData as Contact).company ?? '',
       gender: (contactData as Contact).gender ?? '',
       date_of_birth: (contactData as Contact).date_of_birth ?? '',
+      business_niche: (contactData as Contact).business_niche ?? '',
+      business_goal: (contactData as Contact).business_goal ?? '',
+      business_website: (contactData as Contact).business_website ?? '',
+      business_location: (contactData as Contact).business_location ?? '',
+      business_goals: (contactData as Contact).business_goals ?? [],
       notes: (contactData as Contact).notes ?? '',
       total_revenue: Number((contactData as Contact).total_revenue ?? 0),
     }
@@ -483,6 +488,43 @@ export function ContactDetailPage() {
                   <EditableValue
                     value={contact.company}
                     onSave={(company) => updateField({ company })}
+                  />
+                </FieldRow>
+                <FieldRow label="Website">
+                  <EditableValue
+                    value={contact.business_website}
+                    onSave={(business_website) => updateField({ business_website })}
+                  />
+                </FieldRow>
+                <FieldRow label="Location">
+                  <EditableValue
+                    value={contact.business_location}
+                    onSave={(business_location) => updateField({ business_location })}
+                  />
+                </FieldRow>
+                <FieldRow label="Industry">
+                  <EditableValue
+                    value={contact.business_niche}
+                    onSave={(business_niche) => updateField({ business_niche })}
+                  />
+                </FieldRow>
+                <FieldRow label="Goals">
+                  <EditableValue
+                    value={contact.business_goals.join(', ')}
+                    onSave={(value) =>
+                      updateField({
+                        business_goals: value
+                          .split(',')
+                          .map((v) => v.trim())
+                          .filter(Boolean),
+                      })
+                    }
+                  />
+                </FieldRow>
+                <FieldRow label="Biggest Priority">
+                  <EditableValue
+                    value={contact.business_goal}
+                    onSave={(business_goal) => updateField({ business_goal })}
                   />
                 </FieldRow>
                 <FieldRow label="Date of Birth">

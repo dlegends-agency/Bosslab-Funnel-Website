@@ -9,19 +9,14 @@ export function Problem() {
   return (
     <section ref={ref} className={`section problem reveal ${className}`}>
       <div className="section-inner">
-        <h2 className="section-title">Running a Business Shouldn&apos;t Mean</h2>
-        <h2 className="section-title accent">Doing Everything Yourself.</h2>
+        <h2 className="section-title accent">
+          How Many Customers Are You Losing When Nobody Answers?
+        </h2>
 
         <div className="problem__copy">
-          <p>
-            Every day, business owners spend hours answering calls, replying to
-            messages, posting on social media, following up with leads, and
-            keeping up with marketing.
-          </p>
-          <p>
-            These tasks are important, but they take time away from serving
-            customers and growing the business.
-          </p>
+          <p>Your business can only answer so many calls.</p>
+          <p>Your team can only respond to so many messages.</p>
+          <p>And your customers will not always wait.</p>
         </div>
 
         <div className="pain-grid">
@@ -40,13 +35,31 @@ export function Problem() {
             {painPointsRight.map((item, index) => (
               <li
                 key={item}
-                style={{ '--i': index + 3 } as CSSProperties}
+                style={{ '--i': index + 2 } as CSSProperties}
               >
                 <CloseCircleIcon className="pain-list__icon" />
                 <span>{item}</span>
               </li>
             ))}
           </ul>
+        </div>
+
+        <p className="pivot-text">
+          Every missed opportunity can become a lost customer.
+        </p>
+
+        <div className="problem__copy">
+          <p>
+            BossLab AI helps your business stay available, responsive, and
+            ready to serve customers around the clock.
+          </p>
+        </div>
+
+        <div className="problem__answer">
+          <p>
+            One missed customer can cost more than the tools that help you
+            capture them.
+          </p>
         </div>
       </div>
     </section>

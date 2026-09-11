@@ -1,0 +1,249 @@
+.ob-inner {
+  width: min(560px, 100%);
+}
+
+.ob-sub {
+  max-width: none;
+}
+
+/* ——— Progress indicator ——— */
+.ob-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ob-progress li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.ob-progress li:not(:last-child)::after {
+  content: '';
+  width: 1.75rem;
+  height: 1px;
+  margin-left: 0.5rem;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.ob-progress__dot {
+  display: grid;
+  place-items: center;
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 0.8rem;
+}
+
+.ob-progress li.is-active .ob-progress__dot {
+  border-color: #ae62ff;
+  background: radial-gradient(circle, rgba(174, 98, 255, 0.35), transparent 70%);
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(174, 98, 255, 0.15);
+}
+
+.ob-progress li.is-active .ob-progress__label {
+  color: #fff;
+}
+
+.ob-progress li.is-done .ob-progress__dot {
+  border-color: rgba(94, 226, 154, 0.5);
+  background: rgba(94, 226, 154, 0.16);
+  color: #5ee29a;
+}
+
+.ob-progress li.is-done .ob-progress__label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.ob-progress__label {
+  display: none;
+}
+
+@media (min-width: 520px) {
+  .ob-progress__label {
+    display: inline;
+  }
+}
+
+/* ——— Goal selection cards ——— */
+.ob-goal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+}
+
+.ob-goal-card {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.ob-goal-card:hover {
+  border-color: rgba(174, 98, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.ob-goal-card.is-selected {
+  border-color: #ae62ff;
+  background: rgba(174, 98, 255, 0.14);
+  color: #fff;
+  box-shadow: 0 0 0 1px rgba(174, 98, 255, 0.4);
+}
+
+.ob-goal-card__check {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 1.3rem;
+  height: 1.3rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  font-size: 0.8rem;
+  color: #fff;
+}
+
+.ob-goal-card.is-selected .ob-goal-card__check {
+  border-color: #ae62ff;
+  background: #ae62ff;
+}
+
+.ob-priority {
+  margin-top: 1.35rem;
+}
+
+/* ——— Step navigation ——— */
+.ob-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+
+.ob-actions .checkout__cta {
+  width: auto;
+  min-width: 220px;
+}
+
+.ob-back {
+  border: 0;
+  background: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.ob-back:hover {
+  color: #fff;
+}
+
+/* ——— Confirm summary ——— */
+.ob-summary {
+  display: grid;
+  gap: 1rem;
+  margin: 1.75rem 0 0;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  background: linear-gradient(165deg, rgba(28, 18, 56, 0.72), rgba(8, 10, 28, 0.88));
+  text-align: left;
+}
+
+.ob-summary div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ob-summary dt {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9rem;
+}
+
+.ob-summary dd {
+  margin: 0;
+  max-width: 60%;
+  color: #fff;
+  font-weight: 600;
+  text-align: right;
+}
+
+/* ——— Build animation ——— */
+.ob-build-list {
+  display: grid;
+  gap: 0.9rem;
+  margin: 2rem auto 0;
+  padding: 0;
+  list-style: none;
+  max-width: 24rem;
+  text-align: left;
+}
+
+.ob-build-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+}
+
+.ob-build-list li.is-done {
+  border-color: rgba(94, 226, 154, 0.35);
+  background: rgba(94, 226, 154, 0.08);
+  color: #fff;
+}
+
+.ob-build-list__mark {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #5ee29a;
+  font-size: 0.85rem;
+}
+
+.ob-build-list li.is-done .ob-build-list__mark {
+  border-color: rgba(94, 226, 154, 0.5);
+  background: rgba(94, 226, 154, 0.16);
+}
+
+@media (max-width: 520px) {
+  .ob-goal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ob-summary dd {
+    max-width: 55%;
+  }
+}

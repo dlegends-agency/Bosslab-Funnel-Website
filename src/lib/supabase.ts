@@ -22,6 +22,13 @@ export type Contact = {
   company: string
   gender: string
   date_of_birth: string
+  business_niche: string
+  business_goal: string
+  business_website: string
+  business_location: string
+  business_goals: string[]
+  onboarding_step: number
+  onboarded_at: string | null
   created_at: string
   updated_at: string
 }

@@ -1,21 +1,17 @@
 import { useState } from 'react'
-import { StarField } from '../components/StarField'
-import { SiteHeader } from '../components/SiteHeader'
 import { Hero } from '../components/Hero'
+import { HeroHighlights } from '../components/HeroHighlights'
 import { Problem } from '../components/Problem'
-import { QuickQa } from '../components/QuickQa'
 import { AiTeam } from '../components/AiTeam'
 import { Dashboard } from '../components/Dashboard'
-import { IsThisForMe } from '../components/IsThisForMe'
+import { HowItWorks } from '../components/HowItWorks'
 import { Industries } from '../components/Industries'
 import { Testimonials } from '../components/Testimonials'
 import { Comparison } from '../components/Comparison'
-import { CantIJustUse } from '../components/CantIJustUse'
-import { Pricing } from '../components/Pricing'
+import { TopFeatures } from '../components/TopFeatures'
+import { Waitlist } from '../components/Waitlist'
 import { Faq } from '../components/Faq'
-import { FinalCta } from '../components/FinalCta'
 import { Footer } from '../components/Footer'
-import { ScrollToTopButton } from '../components/ScrollToTopButton'
 import { OptinModal } from '../components/OptinModal'
 
 export function HomePage() {
@@ -23,23 +19,19 @@ export function HomePage() {
 
   return (
     <>
-      <StarField />
-      <SiteHeader onCtaClick={() => setOptinOpen(true)} />
       <Hero onCtaClick={() => setOptinOpen(true)} />
+      <HeroHighlights />
       <Problem />
-      <QuickQa onCtaClick={() => setOptinOpen(true)} />
       <AiTeam />
       <Dashboard onCtaClick={() => setOptinOpen(true)} />
-      <IsThisForMe />
+      <HowItWorks onCtaClick={() => setOptinOpen(true)} />
       <Industries />
       <Testimonials />
       <Comparison />
-      <CantIJustUse onCtaClick={() => setOptinOpen(true)} />
-      <Pricing onCtaClick={() => setOptinOpen(true)} />
+      <TopFeatures />
+      <Waitlist />
       <Faq />
-      <FinalCta onCtaClick={() => setOptinOpen(true)} />
       <Footer />
-      <ScrollToTopButton />
       <OptinModal open={optinOpen} onClose={() => setOptinOpen(false)} />
     </>
   )

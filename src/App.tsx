@@ -17,6 +17,8 @@ import {
   CheckoutSuccessPage,
 } from './pages/CheckoutPage'
 import { HomePage } from './pages/HomePage'
+import { MissionControlPage } from './pages/MissionControlPage'
+import { OnboardingPage } from './pages/OnboardingPage'
 import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage'
 import { TermsPage } from './pages/TermsPage'
 import './App.css'
@@ -48,6 +50,8 @@ function App() {
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
         <Route path="/checkout/cancel" element={<CheckoutCancelPage />} />
+        <Route path="/onboarding" element={<OnboardingPage />} />
+        <Route path="/mission-control" element={<MissionControlPage />} />
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<DashboardPage />} />
           <Route path="contacts" element={<ContactsPage />} />

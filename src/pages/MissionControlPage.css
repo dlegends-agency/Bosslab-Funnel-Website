@@ -1,0 +1,128 @@
+.mc {
+  position: relative;
+  min-height: 100vh;
+  padding: 3rem 1.5rem 5rem;
+  overflow-x: hidden;
+  background:
+    radial-gradient(ellipse 70% 45% at 50% -10%, rgba(174, 98, 255, 0.28), transparent 55%),
+    radial-gradient(circle at 90% 20%, rgba(107, 214, 255, 0.1), transparent 40%),
+    #02010f;
+  color: #fff;
+}
+
+.mc__glow {
+  position: absolute;
+  inset: -15% 10% auto;
+  height: 36%;
+  background: radial-gradient(circle, rgba(174, 98, 255, 0.3), transparent 70%);
+  pointer-events: none;
+}
+
+.mc__inner {
+  position: relative;
+  width: min(880px, 100%);
+  margin-inline: auto;
+  display: grid;
+  gap: 2.25rem;
+}
+
+.mc__header {
+  text-align: center;
+}
+
+.mc__title {
+  margin: 0.75rem 0 0;
+  font-family: var(--font-display, 'Plus Jakarta Sans', sans-serif);
+  font-size: clamp(2rem, 4.2vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.mc__sub {
+  margin: 0.75rem 0 0;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 1.02rem;
+}
+
+.mc-card {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  background: linear-gradient(165deg, rgba(28, 18, 56, 0.72), rgba(8, 10, 28, 0.88));
+}
+
+.mc-ceo {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding: 1.75rem;
+}
+
+.mc-ceo__avatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #c07bff 0%, #ae62ff 50%, #7a4dff 100%);
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+
+.mc-ceo h2 {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-display, 'Plus Jakarta Sans', sans-serif);
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.mc-ceo p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.65;
+  font-size: 0.98rem;
+}
+
+.mc-section-title {
+  margin: 0 0 1rem;
+  font-family: var(--font-display, 'Plus Jakarta Sans', sans-serif);
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.mc-team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.mc-team-card {
+  padding: 1.35rem;
+}
+
+.mc-team-card__badge {
+  color: #5ee29a;
+  font-size: 0.7rem;
+}
+
+.mc-team-card h3 {
+  margin: 0.5rem 0 0.4rem;
+  font-size: 1.02rem;
+  font-weight: 700;
+}
+
+.mc-team-card p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.mc-missions {
+  margin: 0;
+  padding: 0 0 0 1.25rem;
+  display: grid;
+  gap: 0.65rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.98rem;
+}

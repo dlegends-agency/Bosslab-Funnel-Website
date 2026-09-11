@@ -1,124 +1,132 @@
 export const painPointsLeft = [
-  'Missed calls become lost customers',
-  'Leads go unanswered',
-  'Hiring staff is expensive',
+  'Someone calls while you are helping another customer.',
+  'A lead contacts you after hours.',
 ] as const
 
 export const painPointsRight = [
-  'Social media is inconsistent',
-  'Marketing takes too much time',
-  'Too many tools to manage',
-] as const
-
-export const quickQaQuestions = [
-  'Can it answer my phone when I’m slammed with customers?',
-  'Can it text leads back the second they come in?',
-  'Can it write and post my social media for me?',
-  'Can it run my Facebook and Google ads?',
-  'Can it follow up with leads until they actually book?',
-  'Can it manage my CRM and keep contacts organized?',
-  'Can it send review requests after every job?',
-  'Can it build automations without me touching code?',
-  'Does it work for my industry — roofing, HVAC, salons, whatever I run?',
-  'Can I see everything from one dashboard?',
-  'Can I use it with zero tech experience?',
-  'Can I add more AI employees as I grow?',
-  'Does it work nights, weekends, and holidays?',
-  'Do I stay in control of what gets sent out?',
+  'A customer wants to book an appointment while your team is busy.',
+  'A follow-up gets forgotten.',
 ] as const
 
 export const traditionalHiring = [
-  'Hire Employees',
-  'Monthly Salaries',
-  'Training Required',
-  'Fixed Work Hours',
-  'Multiple Tools',
+  'Missed calls',
+  'Unanswered leads',
+  'Manual follow-ups',
+  'Appointment back-and-forth',
+  'Scattered customer information',
+  'Inconsistent marketing',
+  'Repetitive admin work',
+  'Too many disconnected tools',
 ] as const
 
 export const bossLabBenefits = [
-  'Start In Minutes',
-  'One Subscription',
-  'Ready To Use',
-  'Available Around The Clock',
-  'One Platform',
+  'Calls answered',
+  'Leads captured',
+  'Appointments booked',
+  'Follow-ups automated',
+  'Customer information organized',
+  'Marketing supported',
+  'Payments managed',
+  'AI agents working around the clock',
 ] as const
 
-export type Persona = {
-  id: string
-  quote: string
-  role: string
-  image: string
-  tone: 'blue' | 'emerald' | 'orange' | 'pink' | 'cyan' | 'violet'
-}
-
-/**
- * Images are placeholders (see public/images/personas/README.md) —
- * swap in real photos at the same paths and aspect ratio (4:5).
- */
-export const personas: Persona[] = [
-  {
-    id: 'roofer',
-    quote:
-      "I'm on a roof all day. Every missed call is a job I just handed to the competitor down the street.",
-    role: 'The Roofer',
-    image: '/images/personas/roofer.jpg',
-    tone: 'orange',
-  },
-  {
-    id: 'salon',
-    quote:
-      "Between appointments I don't have three free minutes, let alone time to post on social media every day.",
-    role: 'The Salon Owner',
-    image: '/images/personas/salon.jpg',
-    tone: 'pink',
-  },
-  {
-    id: 'plumber',
-    quote:
-      "I've got two guys and a truck. I don't have a marketing department, and I don't want one.",
-    role: 'The Plumber',
-    image: '/images/personas/plumber.jpg',
-    tone: 'blue',
-  },
-  {
-    id: 'dentist',
-    quote:
-      "My front desk is already juggling patients in the chair. They can't also be chasing down every missed call.",
-    role: 'The Office Manager',
-    image: '/images/personas/dentist.jpg',
-    tone: 'cyan',
-  },
-  {
-    id: 'realtor',
-    quote:
-      "Leads go cold in an hour. If I'm mid-showing, that's an hour someone else's agent is talking to my buyer.",
-    role: 'The Real Estate Agent',
-    image: '/images/personas/realtor.jpg',
-    tone: 'violet',
-  },
-  {
-    id: 'restaurant',
-    quote:
-      "I'm running the kitchen at 6pm when the reservation calls come in. Something has to answer that phone.",
-    role: 'The Restaurant Owner',
-    image: '/images/personas/restaurant.jpg',
-    tone: 'emerald',
-  },
-]
-
 export const industries = [
-  { name: 'Roofers', icon: 'roof' },
-  { name: 'Plumbers', icon: 'wrench' },
-  { name: 'Electricians', icon: 'bolt' },
-  { name: 'Dentists', icon: 'tooth' },
-  { name: 'HVAC', icon: 'fan' },
-  { name: 'Auto Repair', icon: 'car' },
-  { name: 'Landscapers', icon: 'leaf' },
-  { name: 'Cleaners', icon: 'sparkle' },
-  { name: 'Real Estate', icon: 'building' },
-  { name: 'Accountants', icon: 'calculator' },
-  { name: 'Salons', icon: 'scissors' },
-  { name: 'Pest Control', icon: 'bug' },
+  {
+    name: 'Dental Clinics',
+    icon: 'tooth',
+    color: '#2f6fed',
+    description: 'Answer patient calls and help book appointments.',
+  },
+  {
+    name: 'Medical Practices',
+    icon: 'medical',
+    color: '#e14361',
+    description: 'Handle inquiries, bookings and patient follow-ups.',
+  },
+  {
+    name: 'Salons',
+    icon: 'scissors',
+    color: '#8b5cf6',
+    description: 'Manage appointments and customer inquiries.',
+  },
+  {
+    name: 'Barbershops',
+    icon: 'comb',
+    color: '#4c5fd6',
+    description: 'Book appointments and answer customer calls.',
+  },
+  {
+    name: 'Spas',
+    icon: 'droplet',
+    color: '#ec6fa5',
+    description: 'Schedule treatments and follow up with clients.',
+  },
+  {
+    name: 'Cleaning Companies',
+    icon: 'sparkle',
+    color: '#22b573',
+    description: 'Capture new inquiries and schedule jobs.',
+  },
+  {
+    name: 'HVAC Companies',
+    icon: 'fan',
+    color: '#2f9fed',
+    description: 'Capture service requests and schedule appointments.',
+  },
+  {
+    name: 'Plumbers',
+    icon: 'wrench',
+    color: '#2f6fed',
+    description: 'Answer calls and book service jobs.',
+  },
+  {
+    name: 'Electricians',
+    icon: 'bolt',
+    color: '#f0b429',
+    description: 'Handle inquiries and schedule on-site visits.',
+  },
+  {
+    name: 'Contractors',
+    icon: 'hardhat',
+    color: '#f0862f',
+    description: 'Capture leads and manage project inquiries.',
+  },
+  {
+    name: 'Auto Repair Shops',
+    icon: 'car',
+    color: '#3b82f6',
+    description: 'Book service appointments and follow up with customers.',
+  },
+  {
+    name: 'Real Estate Businesses',
+    icon: 'building',
+    color: '#16a34a',
+    description: 'Respond to leads and keep follow-ups moving.',
+  },
+  {
+    name: 'Legal Offices',
+    icon: 'gavel',
+    color: '#7c5cff',
+    description: 'Answer client inquiries and schedule consultations.',
+  },
+  {
+    name: 'Restaurants',
+    icon: 'utensils',
+    color: '#f2994a',
+    description: 'Take reservations and manage customer inquiries.',
+  },
+  {
+    name: 'Home Service Businesses',
+    icon: 'house',
+    color: '#14b8a6',
+    description: 'Capture leads and schedule service calls.',
+  },
+  {
+    name: 'Professional Services',
+    icon: 'briefcase',
+    color: '#9333ea',
+    description: 'Manage inquiries and book appointments.',
+  },
 ] as const
 
 export type FeatureValue = string | boolean
@@ -211,106 +219,6 @@ export const pricingPlans: PricingPlan[] = [
       '5,000',
       '50,000',
     ],
-  },
-]
-
-export type ToolComparison = {
-  id: string
-  name: string
-  avatar: string
-  tag: string
-  subtitle: string
-  nails: string[]
-  stops: string[]
-  moment: string
-  verdict: string
-  tone: 'red' | 'blue' | 'orange' | 'pink'
-}
-
-export const toolComparisons: ToolComparison[] = [
-  {
-    id: 'chatgpt',
-    name: '...ChatGPT?',
-    avatar: 'C',
-    tag: 'NOT QUITE',
-    subtitle: 'Great advice. Zero execution.',
-    nails: [
-      'Drafts a caption or a call script in seconds',
-      'Answers "what should I post" at 2am',
-      'Brainstorms offers, emails, and replies',
-    ],
-    stops: [
-      "Doesn't answer your phone or text leads back",
-      "Can't post, schedule, or run anything itself",
-      'You still copy-paste everything into five other tools',
-    ],
-    moment:
-      'The chat window closes and nothing happened. No call answered, no post published, no lead followed up — just a really good draft sitting in your history.',
-    verdict: 'A copywriter. Not an employee.',
-    tone: 'red',
-  },
-  {
-    id: 'zapier',
-    name: '...Zapier?',
-    avatar: 'Z',
-    tag: 'NOT QUITE',
-    subtitle: 'Wires your apps together — if you already know what to wire.',
-    nails: [
-      'Connects the tools you already pay for',
-      'Runs simple if-this-then-that automations',
-      'Great once a workflow is fully mapped out',
-    ],
-    stops: [
-      "Doesn't answer calls, write ads, or create content",
-      'You design, test, and debug every workflow yourself',
-      'Every tool it connects is still a separate subscription',
-    ],
-    moment:
-      "You're three hours into building a lead-followup Zap, hit a broken step, and realize you basically hired yourself as the ops team.",
-    verdict: 'Plumbing. Not a plumber.',
-    tone: 'blue',
-  },
-  {
-    id: 'va',
-    name: '...a Virtual Assistant?',
-    avatar: 'V',
-    tag: 'NOT QUITE',
-    subtitle: 'A real person — with a paycheck, hours, and a learning curve.',
-    nails: [
-      'Handles tasks you actually explain well',
-      'Adds a human touch to messages',
-      'Can make judgment calls once trained',
-    ],
-    stops: [
-      "Off nights, weekends, and when they're sick",
-      "Weeks of onboarding before they're useful",
-      'One VA, one skill set — not calls + ads + social + CRM',
-    ],
-    moment:
-      "It's Friday at 6pm, a lead texts in, and your VA clocked out an hour ago. The lead calls your competitor instead.",
-    verdict: 'A helper. Not a team.',
-    tone: 'orange',
-  },
-  {
-    id: 'agency',
-    name: '...a Marketing Agency?',
-    avatar: 'A',
-    tag: 'NOT QUITE',
-    subtitle: 'Professional work. Agency timelines and agency invoices.',
-    nails: [
-      'Produces polished ads and content',
-      'Brings real strategy experience',
-      'Handles the accounts you hand them',
-    ],
-    stops: [
-      '$2,000+/month retainers before results show up',
-      'Days to turn around one campaign, not minutes',
-      "Doesn't touch your calls, leads, or CRM at all",
-    ],
-    moment:
-      'You approve the invoice before you see the results, then wait two weeks for round one of "the ad."',
-    verdict: 'A vendor. Not your team.',
-    tone: 'pink',
   },
 ]
 

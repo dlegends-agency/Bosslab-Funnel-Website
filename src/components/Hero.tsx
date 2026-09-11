@@ -7,47 +7,62 @@ type HeroProps = {
 
 export function Hero({ onCtaClick }: HeroProps) {
   return (
-    <section
-      className="hero"
-      style={{ backgroundImage: 'url(/images/hero-bg.png)' }}
-    >
+    <section className="hero">
       <div className="hero__atmos" aria-hidden="true" />
       <div className="hero__inner section-inner">
-        <h1
-          className="hero__title reveal-item"
-          style={{ '--d': '0ms' } as CSSProperties}
-        >
-          Meet Your New <span className="accent">AI Team</span>
-        </h1>
-        <p
-          className="hero__eyebrow reveal-item"
-          style={{ '--d': '80ms' } as CSSProperties}
-        >
-          Next Generation Ai Digital Intelligence
-        </p>
-        <p
-          className="hero__copy reveal-item"
-          style={{ '--d': '160ms' } as CSSProperties}
-        >
-          Boss Lab AI gives your business a team of AI employees that answer
-          calls, create marketing, manage social media, follow up with leads, run
-          ads, and automate daily work, all from one dashboard.
-        </p>
-        <div
-          className="reveal-item"
-          style={{ '--d': '240ms' } as CSSProperties}
-        >
-          <CtaButton onClick={onCtaClick} />
+        <div className="hero__content">
+          <div
+            className="hero__brand reveal-item"
+            style={{ '--d': '0ms' } as CSSProperties}
+          >
+            <img
+              src="/images/bosslabai-logo.png"
+              alt="Boss Lab AI"
+              width={2048}
+              height={682}
+            />
+          </div>
+          <p
+            className="hero__eyebrow reveal-item"
+            style={{ '--d': '80ms' } as CSSProperties}
+          >
+            YOUR AI BUSINESS TEAM IS READY
+          </p>
+          <h1
+            className="hero__title reveal-item"
+            style={{ '--d': '160ms' } as CSSProperties}
+          >
+            Meet Your
+            <br />
+            <span className="accent">New AI Team</span>
+          </h1>
+          <p
+            className="hero__subcopy reveal-item"
+            style={{ '--d': '240ms' } as CSSProperties}
+          >
+            A complete AI workforce inside a 3D office built for local businesses.
+          </p>
+          <p
+            className="hero__copy reveal-item"
+            style={{ '--d': '320ms' } as CSSProperties}
+          >
+            Answer calls, capture leads, book appointments, create marketing, follow
+            up automatically, and grow your business - 24/7.
+          </p>
+          <div
+            className="hero__cta reveal-item"
+            style={{ '--d': '400ms' } as CSSProperties}
+          >
+            <CtaButton onClick={onCtaClick} />
+          </div>
         </div>
-        <div
-          className="hero__visual reveal-item"
-          style={{ '--d': '340ms' } as CSSProperties}
-        >
+        <div className="hero__image-wrap" aria-hidden="true">
           <img
-            src="/images/hero-dashboard.png"
-            alt="Boss Lab AI dashboard on a tablet with AI assistant"
-            width={1284}
-            height={596}
+            className="hero__image"
+            src="/images/ai3doffice.png"
+            alt=""
+            width={2048}
+            height={1152}
           />
         </div>
       </div>
