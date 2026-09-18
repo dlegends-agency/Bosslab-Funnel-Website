@@ -252,6 +252,30 @@
   color: rgba(255, 255, 255, 0.3);
 }
 
+.ra-pagespeed__item.is-good {
+  border-color: rgba(52, 211, 153, 0.35);
+}
+
+.ra-pagespeed__item.is-good .ra-pagespeed__score {
+  color: #34d399;
+}
+
+.ra-pagespeed__item.is-average {
+  border-color: rgba(251, 191, 36, 0.35);
+}
+
+.ra-pagespeed__item.is-average .ra-pagespeed__score {
+  color: #fbbf24;
+}
+
+.ra-pagespeed__item.is-poor {
+  border-color: rgba(248, 113, 113, 0.35);
+}
+
+.ra-pagespeed__item.is-poor .ra-pagespeed__score {
+  color: #f87171;
+}
+
 .ra-pagespeed__label {
   margin: 0.35rem 0 0;
   color: var(--text-muted);

@@ -85,19 +85,29 @@ const pages = [
   },
 ]
 
+const pageSpeedCapturedAt = 'Sep 18, 2026 (mobile, Lighthouse)'
+
 const pageSpeed = [
-  { label: 'Performance' },
-  { label: 'Accessibility' },
-  { label: 'Best Practices' },
-  { label: 'SEO' },
+  { label: 'Performance', score: 61 },
+  { label: 'Accessibility', score: 100 },
+  { label: 'Best Practices', score: 96 },
+  { label: 'SEO', score: 66 },
 ]
 
 const phase2: { priority: 'High' | 'Medium' | 'Low'; scope: string; issue: string; fix: string }[] = [
   {
+    priority: 'Medium',
+    scope: 'SEO',
+    issue:
+      'robots.txt disallows /report-audit while the page itself sets <meta name="robots" content="index, follow">, so it is blocked from indexing.',
+    fix: 'Decide whether this page should be public: remove the Disallow rule to allow indexing, or drop the meta tag to make the block intentional.',
+  },
+  {
     priority: 'Low',
-    scope: 'PageSpeed',
-    issue: 'No Lighthouse baseline captured yet.',
-    fix: 'Run PageSpeed Insights on mobile + desktop and record scores here.',
+    scope: 'Performance',
+    issue:
+      'Largest Contentful Paint is 5.8s on mobile, driven mainly by a 281KB unoptimized hero image and render-blocking GTM/Facebook Pixel scripts.',
+    fix: 'Resize/compress the largest hero image and defer third-party tracking scripts until after first paint.',
   },
   {
     priority: 'Low',
@@ -221,10 +231,15 @@ export function ReportAuditPage() {
           <p>
             <span className="ra-summary__icon ra-summary__icon--warn">⚠</span>
             Remaining: {3 - configuredCount} tracking platform
-            {3 - configuredCount === 1 ? '' : 's'} still unconfigured, and no
-            PageSpeed baseline has been captured yet.
+            {3 - configuredCount === 1 ? '' : 's'} still unconfigured.
           </p>
         ) : null}
+        <p>
+          <span className="ra-summary__icon ra-summary__icon--warn">⚠</span>
+          PageSpeed: robots.txt currently blocks this page from indexing
+          despite its own meta tag allowing it — see the PageSpeed Insights
+          section below.
+        </p>
       </section>
 
       <section className="ra-section">
@@ -351,13 +366,21 @@ export function ReportAuditPage() {
       <section className="ra-section">
         <h2>PageSpeed Insights Audit</h2>
         <p className="ra-section__sub">
-          Baseline not captured yet. Run PageSpeed Insights on mobile +
-          desktop and record scores here.
+          Baseline captured {pageSpeedCapturedAt}.
         </p>
         <div className="ra-pagespeed">
           {pageSpeed.map((item) => (
-            <div className="ra-pagespeed__item" key={item.label}>
-              <p className="ra-pagespeed__score">—</p>
+            <div
+              className={`ra-pagespeed__item${
+                item.score >= 90
+                  ? ' is-good'
+                  : item.score >= 50
+                    ? ' is-average'
+                    : ' is-poor'
+              }`}
+              key={item.label}
+            >
+              <p className="ra-pagespeed__score">{item.score}</p>
               <p className="ra-pagespeed__label">{item.label}</p>
             </div>
           ))}
