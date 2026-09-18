@@ -33,6 +33,10 @@ import {
   type AutomationStep,
   type AutomationStepType,
   type AutomationTriggerConfig,
+  type ConditionField,
+  type ConditionMatchMode,
+  type ConditionOperator,
+  type ConditionRule,
   type DelayUnit,
   type List,
   type OrderContainsMode,
@@ -58,16 +62,27 @@ type DelayDraft = {
   amount: number
   unit: DelayUnit
   untilTime: boolean
+  untilTimeValue: string
   untilWeekday: boolean
+  untilWeekdays: number[]
   datetime: string
   customField: string
 }
 
+const WEEKDAY_OPTIONS = [
+  { value: 0, label: 'Sun' },
+  { value: 1, label: 'Mon' },
+  { value: 2, label: 'Tue' },
+  { value: 3, label: 'Wed' },
+  { value: 4, label: 'Thu' },
+  { value: 5, label: 'Fri' },
+  { value: 6, label: 'Sat' },
+]
+
 type ConditionDraft = {
-  started: boolean
-  categories: string[]
-  activeIndex: number
-  menuOpen: boolean
+  rules: ConditionRule[]
+  matchMode: ConditionMatchMode
+  legacyCategories: string[]
 }
 
 type StepDraft = {
@@ -93,33 +108,103 @@ const ADD_STEP_OPTIONS: {
   { id: 'exit', label: 'Exit', icon: '⇨', iconClass: 'is-exit' },
 ]
 
-const CONDITION_CATEGORIES = [
-  'Segments',
-  'Contact Details',
-  'User',
-  'WooCommerce',
-  'Geography',
-  'Engagement',
-  'Broadcast',
-  'Automation',
-  'DateTime',
+const CONDITION_FIELD_OPTIONS: { id: ConditionField; label: string }[] = [
+  { id: 'email', label: 'Email' },
+  { id: 'first_name', label: 'First Name' },
+  { id: 'last_name', label: 'Last Name' },
+  { id: 'phone', label: 'Phone' },
+  { id: 'company', label: 'Company' },
+  { id: 'status', label: 'Subscription Status' },
+  { id: 'business_niche', label: 'Business Niche' },
+  { id: 'order_plan', label: 'Order Plan' },
+  { id: 'total_revenue', label: 'Total Revenue' },
+  { id: 'onboarded_at', label: 'Onboarded Date' },
+  { id: 'has_tag', label: 'Has Tag' },
+  { id: 'has_list', label: 'Is In List' },
 ]
+
+const CONDITION_OPERATOR_LABELS: Record<ConditionOperator, string> = {
+  is_set: 'Is set',
+  is_empty: 'Is empty',
+  equals: 'Equals',
+  not_equals: 'Does not equal',
+  contains: 'Contains',
+  not_contains: 'Does not contain',
+  greater_than: 'Greater than',
+  less_than: 'Less than',
+  has: 'Has',
+  not_has: 'Does not have',
+}
+
+function operatorsForConditionField(field: ConditionField): ConditionOperator[] {
+  if (field === 'has_tag' || field === 'has_list') return ['has', 'not_has']
+  if (field === 'total_revenue') {
+    return ['is_set', 'is_empty', 'equals', 'not_equals', 'greater_than', 'less_than']
+  }
+  return ['is_set', 'is_empty', 'equals', 'not_equals', 'contains', 'not_contains']
+}
+
+function conditionRuleNeedsValue(operator: ConditionOperator) {
+  return operator !== 'is_set' && operator !== 'is_empty'
+}
+
+function fieldLabel(field: ConditionField) {
+  return CONDITION_FIELD_OPTIONS.find((option) => option.id === field)?.label ?? field
+}
+
+function describeConditionRule(rule: ConditionRule, lists: List[], tags: Tag[]) {
+  const label = fieldLabel(rule.field)
+  const opLabel = CONDITION_OPERATOR_LABELS[rule.operator]
+  if (!conditionRuleNeedsValue(rule.operator)) return `${label} ${opLabel.toLowerCase()}`
+  if (rule.field === 'has_tag') {
+    const tagName = tags.find((tag) => tag.id === rule.value)?.name ?? rule.value ?? ''
+    return `Tag ${rule.operator === 'not_has' ? 'does not include' : 'includes'} "${tagName}"`
+  }
+  if (rule.field === 'has_list') {
+    const listName = lists.find((list) => list.id === rule.value)?.name ?? rule.value ?? ''
+    return `List ${rule.operator === 'not_has' ? 'does not include' : 'includes'} "${listName}"`
+  }
+  return `${label} ${opLabel.toLowerCase()} "${rule.value ?? ''}"`
+}
+
+function describeConditionRules(
+  rules: ConditionRule[],
+  matchMode: ConditionMatchMode,
+  lists: List[],
+  tags: Tag[],
+) {
+  return rules
+    .map((rule) => describeConditionRule(rule, lists, tags))
+    .join(matchMode === 'any' ? ' OR ' : ' AND ')
+}
+
+function conditionRuleIsValid(rule: ConditionRule) {
+  if (!rule.field || !rule.operator) return false
+  if (!conditionRuleNeedsValue(rule.operator)) return true
+  return Boolean(rule.value && rule.value.trim())
+}
 
 const defaultDelayDraft = (): DelayDraft => ({
   mode: 'period',
   amount: 1,
   unit: 'days',
   untilTime: false,
+  untilTimeValue: '09:00',
   untilWeekday: false,
+  untilWeekdays: [],
   datetime: '',
   customField: '',
 })
 
 const defaultConditionDraft = (): ConditionDraft => ({
-  started: false,
-  categories: [],
-  activeIndex: 0,
-  menuOpen: false,
+  rules: [],
+  matchMode: 'all',
+  legacyCategories: [],
+})
+
+const defaultConditionRule = (): ConditionRule => ({
+  field: 'email',
+  operator: 'is_set',
 })
 
 const defaultStepDraft = (type: StepDraft['type']): StepDraft => ({
@@ -175,6 +260,9 @@ export function AutomationEditorPage() {
   const [error, setError] = useState('')
   const [activeTab, setActiveTab] = useState<BuilderTab>('workflow')
   const [statusSaving, setStatusSaving] = useState(false)
+  const [editingName, setEditingName] = useState(false)
+  const [nameDraft, setNameDraft] = useState('')
+  const [nameSaving, setNameSaving] = useState(false)
   const [modal, setModal] = useState<ModalKind>(null)
   const [insertAt, setInsertAt] = useState<number | null>(null)
   const [eventCategory, setEventCategory] = useState<EventCategoryId>('crm')
@@ -309,6 +397,39 @@ export function AutomationEditorPage() {
       return
     }
     setAutomation({ ...automation, status: next })
+    setError('')
+  }
+
+  const startEditingName = () => {
+    if (!automation) return
+    setNameDraft(automation.name)
+    setEditingName(true)
+  }
+
+  const cancelEditingName = () => {
+    setEditingName(false)
+    setNameDraft('')
+  }
+
+  const saveName = async () => {
+    if (!automation) return
+    const trimmed = nameDraft.trim()
+    if (!trimmed || trimmed === automation.name) {
+      setEditingName(false)
+      return
+    }
+    setNameSaving(true)
+    const { error: updateError } = await supabase
+      .from('automations')
+      .update({ name: trimmed, updated_at: new Date().toISOString() })
+      .eq('id', automation.id)
+    setNameSaving(false)
+    if (updateError) {
+      setError('Could not rename automation.')
+      return
+    }
+    setAutomation({ ...automation, name: trimmed })
+    setEditingName(false)
     setError('')
   }
 
@@ -572,7 +693,9 @@ export function AutomationEditorPage() {
         amount: step.config.delay_amount ?? step.config.delay_days ?? 1,
         unit: step.config.delay_unit ?? 'days',
         untilTime: Boolean(step.config.delay_until_time),
+        untilTimeValue: step.config.delay_until_time_value ?? '09:00',
         untilWeekday: Boolean(step.config.delay_until_weekday),
+        untilWeekdays: step.config.delay_until_weekdays ?? [],
         datetime: step.config.delay_datetime ?? '',
         customField: step.config.delay_custom_field ?? '',
       })
@@ -580,18 +703,25 @@ export function AutomationEditorPage() {
       return
     }
     if (step.step_type === 'condition') {
-      const categories =
-        step.config.condition_categories?.length
-          ? step.config.condition_categories
-          : step.config.condition_category
-            ? [step.config.condition_category]
-            : []
-      setPendingCondition({
-        started: categories.length > 0,
-        categories,
-        activeIndex: 0,
-        menuOpen: false,
-      })
+      if (step.config.condition_rules?.length) {
+        setPendingCondition({
+          rules: step.config.condition_rules,
+          matchMode: step.config.condition_match ?? 'all',
+          legacyCategories: [],
+        })
+      } else {
+        const categories =
+          step.config.condition_categories?.length
+            ? step.config.condition_categories
+            : step.config.condition_category
+              ? [step.config.condition_category]
+              : []
+        setPendingCondition({
+          rules: [],
+          matchMode: 'all',
+          legacyCategories: categories,
+        })
+      }
       setModal('conditionConfig')
       return
     }
@@ -617,7 +747,13 @@ export function AutomationEditorPage() {
     delay_amount: pendingDelay.amount,
     delay_unit: pendingDelay.unit,
     delay_until_time: pendingDelay.untilTime,
+    delay_until_time_value: pendingDelay.untilTime
+      ? pendingDelay.untilTimeValue
+      : undefined,
     delay_until_weekday: pendingDelay.untilWeekday,
+    delay_until_weekdays: pendingDelay.untilWeekday
+      ? pendingDelay.untilWeekdays
+      : undefined,
     delay_datetime: pendingDelay.datetime || undefined,
     delay_custom_field: pendingDelay.customField || undefined,
     delay_days:
@@ -660,17 +796,22 @@ export function AutomationEditorPage() {
   }
 
   const saveConditionStep = async () => {
-    const categories = pendingCondition.categories.filter(Boolean)
-    if (!categories.length) {
-      setError('Select at least one condition category.')
+    const rules = pendingCondition.rules.filter(conditionRuleIsValid)
+    if (!rules.length) {
+      setError('Add at least one condition rule.')
       return
     }
     setSaving(true)
     setError('')
     const config: AutomationStep['config'] = {
-      condition_categories: categories,
-      condition_category: categories[0],
-      condition_label: categories.join(' OR '),
+      condition_rules: rules,
+      condition_match: pendingCondition.matchMode,
+      condition_label: describeConditionRules(
+        rules,
+        pendingCondition.matchMode,
+        lists,
+        tags,
+      ),
     }
     if (editingStepId) {
       const { error: updateError } = await supabase
@@ -837,7 +978,38 @@ export function AutomationEditorPage() {
             <Link to="/admin/automations" className="fk-builder__back">
               Automations
             </Link>
-            <h1>{automation.name}</h1>
+            {editingName ? (
+              <input
+                type="text"
+                className="fk-builder__name-input"
+                value={nameDraft}
+                autoFocus
+                disabled={nameSaving}
+                onChange={(e) => setNameDraft(e.target.value)}
+                onBlur={() => void saveName()}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    void saveName()
+                  } else if (e.key === 'Escape') {
+                    e.preventDefault()
+                    cancelEditingName()
+                  }
+                }}
+              />
+            ) : (
+              <button
+                type="button"
+                className="fk-builder__name-edit"
+                onClick={startEditingName}
+                title="Rename automation"
+              >
+                <h1>{automation.name}</h1>
+                <span className="fk-builder__name-edit-icon" aria-hidden="true">
+                  ✎
+                </span>
+              </button>
+            )}
           </div>
           <div className="fk-builder__header-actions">
             <label
@@ -1354,6 +1526,8 @@ export function AutomationEditorPage() {
       {modal === 'conditionConfig' ? (
         <ConditionConfigModal
           draft={pendingCondition}
+          lists={lists}
+          tags={tags}
           onChange={setPendingCondition}
           onCancel={() =>
             setModal(editingStepId ? null : 'addStep')
@@ -1611,7 +1785,7 @@ function OrderTriggerConfigModal({
                   <input
                     type="radio"
                     name="order-contains"
-                    checked={contains === option.id || (contains === 'category' && option.id === 'any')}
+                    checked={contains === option.id}
                     onChange={() =>
                       onChange({
                         ...config,
@@ -2193,6 +2367,16 @@ function DelayConfigModal({
                       />
                       Delay until a specific time of day
                     </label>
+                    {draft.untilTime ? (
+                      <input
+                        type="time"
+                        value={draft.untilTimeValue}
+                        onChange={(e) =>
+                          onChange({ ...draft, untilTimeValue: e.target.value })
+                        }
+                        style={{ marginLeft: '1.6rem', marginBottom: '0.5rem' }}
+                      />
+                    ) : null}
                     <label>
                       <input
                         type="checkbox"
@@ -2206,6 +2390,48 @@ function DelayConfigModal({
                       />
                       Delay until a specific day(s) of the week
                     </label>
+                    {draft.untilWeekday ? (
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          gap: '0.4rem',
+                          marginLeft: '1.6rem',
+                        }}
+                      >
+                        {WEEKDAY_OPTIONS.map((day) => {
+                          const checked = draft.untilWeekdays.includes(day.value)
+                          return (
+                            <label
+                              key={day.value}
+                              className="fk-weekday-chip"
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.3rem',
+                                fontSize: '0.8rem',
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                onChange={(e) =>
+                                  onChange({
+                                    ...draft,
+                                    untilWeekdays: e.target.checked
+                                      ? [...draft.untilWeekdays, day.value]
+                                      : draft.untilWeekdays.filter(
+                                          (d) => d !== day.value,
+                                        ),
+                                  })
+                                }
+                              />
+                              {day.label}
+                            </label>
+                          )
+                        })}
+                      </div>
+                    ) : null}
                   </div>
                   <div className="fk-delay-summary">
                     <span>i</span>
@@ -2289,17 +2515,30 @@ function DelayConfigModal({
 
 function ConditionConfigModal({
   draft,
+  lists,
+  tags,
   onChange,
   onCancel,
   onSave,
   saving,
 }: {
   draft: ConditionDraft
+  lists: List[]
+  tags: Tag[]
   onChange: (draft: ConditionDraft) => void
   onCancel: () => void
   onSave: () => void
   saving?: boolean
 }) {
+  const hasLegacy = draft.legacyCategories.length > 0 && draft.rules.length === 0
+
+  const updateRule = (index: number, patch: Partial<ConditionRule>) => {
+    const next = draft.rules.map((rule, i) =>
+      i === index ? { ...rule, ...patch } : rule,
+    )
+    onChange({ ...draft, rules: next })
+  }
+
   return (
     <div className="fk-modal-overlay" role="presentation" onClick={onCancel}>
       <div
@@ -2324,7 +2563,29 @@ function ConditionConfigModal({
           </button>
         </div>
 
-        {!draft.started ? (
+        {hasLegacy ? (
+          <div className="fk-condition-empty">
+            <h3>Legacy condition</h3>
+            <p>
+              This condition was saved before the rule builder shipped:{' '}
+              <strong>{draft.legacyCategories.join(' OR ')}</strong>. It still
+              runs as-is. Upgrade it to use real field/operator/value rules.
+            </p>
+            <button
+              type="button"
+              className="fk-btn fk-btn--primary"
+              onClick={() =>
+                onChange({
+                  rules: [defaultConditionRule()],
+                  matchMode: 'all',
+                  legacyCategories: [],
+                })
+              }
+            >
+              Upgrade to rule builder
+            </button>
+          </div>
+        ) : !draft.rules.length ? (
           <div className="fk-condition-empty">
             <svg width="72" height="56" viewBox="0 0 72 56" fill="none" aria-hidden="true">
               <rect
@@ -2345,20 +2606,14 @@ function ConditionConfigModal({
             </svg>
             <h3>No Condition</h3>
             <p>
-              Add a condition to segment and make contacts flow to different
-              branches
+              Add a rule to segment and decide whether contacts continue
+              through this automation.
             </p>
             <button
               type="button"
               className="fk-btn fk-btn--primary"
               onClick={() =>
-                onChange({
-                  ...draft,
-                  started: true,
-                  categories: [''],
-                  activeIndex: 0,
-                  menuOpen: true,
-                })
+                onChange({ ...draft, rules: [defaultConditionRule()] })
               }
             >
               Add New Condition
@@ -2366,74 +2621,152 @@ function ConditionConfigModal({
           </div>
         ) : (
           <div className="fk-light-modal__body">
-            {draft.categories.map((category, index) => (
-              <div key={`condition-${index}`}>
-                {index > 0 ? (
-                  <div className="fk-condition-and" style={{ marginBottom: '0.65rem' }}>
-                    OR
-                  </div>
-                ) : null}
-                <div className="fk-condition-box">
+            <div className="fk-condition-row" style={{ marginBottom: '0.75rem' }}>
+              <span>Match</span>
+              <div className="fk-condition-select">
+                <select
+                  value={draft.matchMode}
+                  onChange={(e) =>
+                    onChange({
+                      ...draft,
+                      matchMode: e.target.value as ConditionMatchMode,
+                    })
+                  }
+                >
+                  <option value="all">All rules (AND)</option>
+                  <option value="any">Any rule (OR)</option>
+                </select>
+              </div>
+            </div>
+
+            {draft.rules.map((rule, index) => {
+              const operators = operatorsForConditionField(rule.field)
+              const needsValue = conditionRuleNeedsValue(rule.operator)
+              return (
+                <div key={`rule-${index}`} className="fk-condition-box">
                   <div className="fk-condition-row">
                     <span>For</span>
                     <div className="fk-condition-select">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          onChange({
-                            ...draft,
-                            activeIndex: index,
-                            menuOpen:
-                              draft.activeIndex === index
-                                ? !draft.menuOpen
-                                : true,
+                      <select
+                        value={rule.field}
+                        onChange={(e) => {
+                          const field = e.target.value as ConditionField
+                          const nextOperators = operatorsForConditionField(field)
+                          updateRule(index, {
+                            field,
+                            operator: nextOperators[0],
+                            value: '',
+                          })
+                        }}
+                      >
+                        {CONDITION_FIELD_OPTIONS.map((option) => (
+                          <option key={option.id} value={option.id}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="fk-condition-select">
+                      <select
+                        value={rule.operator}
+                        onChange={(e) =>
+                          updateRule(index, {
+                            operator: e.target.value as ConditionOperator,
                           })
                         }
                       >
-                        <span>{category || 'Select'}</span>
-                        <span aria-hidden="true">▾</span>
-                      </button>
-                      {draft.menuOpen && draft.activeIndex === index ? (
-                        <div className="fk-condition-menu">
-                          {CONDITION_CATEGORIES.map((option) => (
-                            <button
-                              key={option}
-                              type="button"
-                              className={category === option ? 'is-active' : ''}
-                              onClick={() => {
-                                const next = [...draft.categories]
-                                next[index] = option
-                                onChange({
-                                  ...draft,
-                                  categories: next,
-                                  menuOpen: false,
-                                })
-                              }}
-                            >
-                              <span>{option}</span>
-                              <span aria-hidden="true">›</span>
-                            </button>
-                          ))}
-                        </div>
-                      ) : null}
+                        {operators.map((op) => (
+                          <option key={op} value={op}>
+                            {CONDITION_OPERATOR_LABELS[op]}
+                          </option>
+                        ))}
+                      </select>
                     </div>
+                    {needsValue ? (
+                      rule.field === 'has_tag' ? (
+                        <div className="fk-condition-select">
+                          <select
+                            value={rule.value ?? ''}
+                            onChange={(e) =>
+                              updateRule(index, { value: e.target.value })
+                            }
+                          >
+                            <option value="">Select tag</option>
+                            {tags.map((tag) => (
+                              <option key={tag.id} value={tag.id}>
+                                {tag.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      ) : rule.field === 'has_list' ? (
+                        <div className="fk-condition-select">
+                          <select
+                            value={rule.value ?? ''}
+                            onChange={(e) =>
+                              updateRule(index, { value: e.target.value })
+                            }
+                          >
+                            <option value="">Select list</option>
+                            {lists.map((list) => (
+                              <option key={list.id} value={list.id}>
+                                {list.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      ) : rule.field === 'status' ? (
+                        <div className="fk-condition-select">
+                          <select
+                            value={rule.value ?? ''}
+                            onChange={(e) =>
+                              updateRule(index, { value: e.target.value })
+                            }
+                          >
+                            <option value="">Select status</option>
+                            <option value="subscribed">Subscribed</option>
+                            <option value="unsubscribed">Unsubscribed</option>
+                            <option value="bounced">Bounced</option>
+                          </select>
+                        </div>
+                      ) : (
+                        <input
+                          type={rule.field === 'total_revenue' ? 'number' : 'text'}
+                          value={rule.value ?? ''}
+                          placeholder="Value"
+                          onChange={(e) =>
+                            updateRule(index, { value: e.target.value })
+                          }
+                        />
+                      )
+                    ) : null}
+                    <button
+                      type="button"
+                      className="fk-flow-card__delete"
+                      onClick={() =>
+                        onChange({
+                          ...draft,
+                          rules: draft.rules.filter((_, i) => i !== index),
+                        })
+                      }
+                    >
+                      Remove
+                    </button>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
             <button
               type="button"
               className="fk-condition-or"
               onClick={() =>
                 onChange({
                   ...draft,
-                  categories: [...draft.categories, ''],
-                  activeIndex: draft.categories.length,
-                  menuOpen: true,
+                  rules: [...draft.rules, defaultConditionRule()],
                 })
               }
             >
-              OR Condition
+              Add Rule
             </button>
           </div>
         )}
@@ -2446,10 +2779,7 @@ function ConditionConfigModal({
             type="button"
             className="fk-btn fk-btn--primary"
             onClick={onSave}
-            disabled={
-              saving ||
-              !draft.categories.some((category) => Boolean(category.trim()))
-            }
+            disabled={saving || hasLegacy || !draft.rules.some(conditionRuleIsValid)}
           >
             Save
           </button>

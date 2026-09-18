@@ -82,7 +82,7 @@ export type ActionType =
   | 'zapier_webhook'
   | 'send_email'
 
-export type OrderContainsMode = 'any' | 'specific' | 'category'
+export type OrderContainsMode = 'any' | 'specific'
 
 export type OrderRunFrequency = 'once' | 'multiple'
 
@@ -93,6 +93,40 @@ export type OrderStatusOption =
   | 'processing'
 
 export type EntityContainsMode = 'any' | 'specific'
+
+export type ConditionField =
+  | 'email'
+  | 'first_name'
+  | 'last_name'
+  | 'phone'
+  | 'company'
+  | 'status'
+  | 'business_niche'
+  | 'order_plan'
+  | 'total_revenue'
+  | 'onboarded_at'
+  | 'has_tag'
+  | 'has_list'
+
+export type ConditionOperator =
+  | 'is_set'
+  | 'is_empty'
+  | 'equals'
+  | 'not_equals'
+  | 'contains'
+  | 'not_contains'
+  | 'greater_than'
+  | 'less_than'
+  | 'has'
+  | 'not_has'
+
+export type ConditionRule = {
+  field: ConditionField
+  operator: ConditionOperator
+  value?: string
+}
+
+export type ConditionMatchMode = 'all' | 'any'
 
 export type AutomationTriggerConfig = {
   order_statuses?: OrderStatusOption[]
@@ -145,12 +179,16 @@ export type AutomationStep = {
     delay_amount?: number
     delay_unit?: DelayUnit
     delay_until_time?: boolean
+    delay_until_time_value?: string
     delay_until_weekday?: boolean
+    delay_until_weekdays?: number[]
     delay_datetime?: string
     delay_custom_field?: string
     condition_category?: string
     condition_label?: string
     condition_categories?: string[]
+    condition_rules?: ConditionRule[]
+    condition_match?: ConditionMatchMode
     goal_name?: string
     jump_to_position?: number
     split_percent?: number
@@ -163,8 +201,9 @@ export type AutomationRun = {
   id: string
   automation_id: string
   contact_id: string
-  status: 'running' | 'completed' | 'failed'
+  status: 'running' | 'waiting' | 'completed' | 'failed'
   current_step: number
+  resume_at: string | null
   started_at: string
   finished_at: string | null
 }
