@@ -1,14 +1,7 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { loadPixelSettings, type PixelTrackingSettings } from '../lib/pixelSettings'
 import './ReportAuditPage.css'
-
-const stats = [
-  { value: '3', label: 'Content Pages' },
-  { value: '3/3', label: 'With Meta Description' },
-  { value: '3/3', label: 'With OG Tags' },
-  { value: '3/3', label: 'With Canonical' },
-  { value: '3/3', label: 'Unique Titles' },
-  { value: '0/3', label: 'Trackers Configured' },
-]
 
 type Status = 'Open' | 'Review' | 'Fixed'
 
@@ -22,12 +15,7 @@ function StatusBadge({ status }: { status: Status }) {
   return <span className={statusClass[status]}>{status}</span>
 }
 
-const issues: {
-  area: string
-  issue: string
-  resolution: string
-  status: Status
-}[] = [
+const staticIssues: { area: string; issue: string; resolution: string; status: Status }[] = [
   {
     area: 'Site-wide — document head',
     issue:
@@ -60,14 +48,6 @@ const issues: {
     status: 'Fixed',
   },
   {
-    area: 'Tracking — pixel configuration',
-    issue:
-      'Facebook Pixel, GA4, and Google Ads code is implemented, but all IDs are empty by default.',
-    resolution:
-      'Enter live pixel / measurement / conversion IDs in /admin/settings, then verify events in each platform’s test tool. Requires real account credentials — can’t be completed from code alone.',
-    status: 'Open',
-  },
-  {
     area: 'Hosting — SPA fallback',
     issue:
       'No explicit _redirects, _headers, or vercel.json was committed for deep-link rewrites on a static host.',
@@ -81,30 +61,6 @@ const issues: {
     resolution:
       'Added favicon-32x32.png and apple-touch-icon.png, rendered from the existing SVG, and linked them in index.html.',
     status: 'Fixed',
-  },
-]
-
-const trackers = [
-  {
-    tool: 'Facebook Pixel',
-    id: 'Set via /admin/settings',
-    source: 'connect.facebook.net/en_US/fbevents.js',
-    status: 'Not configured',
-    notes: 'Loads once a pixel ID is saved. Fires PageView, Lead, AddToCart, Purchase — each toggleable per event.',
-  },
-  {
-    tool: 'Google Analytics (GA4)',
-    id: 'Set via /admin/settings',
-    source: 'googletagmanager.com/gtag/js',
-    status: 'Not configured',
-    notes: 'Fires page_view, generate_lead, and purchase events once a measurement ID is saved.',
-  },
-  {
-    tool: 'Google Ads',
-    id: 'Set via /admin/settings',
-    source: 'shares gtag.js with GA4',
-    status: 'Not configured',
-    notes: 'Fires conversion events for leads and purchases once a conversion ID and labels are saved.',
   },
 ]
 
@@ -129,25 +85,6 @@ const pages = [
   },
 ]
 
-const infrastructure = [
-  { label: 'Framework', value: 'Vite 8.2 + React 19.2 (client-rendered SPA)' },
-  { label: 'Router', value: 'react-router-dom 7 — BrowserRouter' },
-  {
-    label: 'Rendering',
-    value:
-      'Client-rendered SPA + build-time prerendered HTML snapshot (scripts/prerender.mjs) for the 3 marketing routes',
-  },
-  { label: 'Sitemap', value: 'public/sitemap.xml' },
-  { label: 'robots.txt', value: 'public/robots.txt' },
-  { label: 'SPA fallback', value: 'public/_redirects (catch-all → /index.html)' },
-  { label: 'Favicon', value: '/favicon.svg + /favicon-32x32.png + /apple-touch-icon.png' },
-  { label: 'OG image', value: '/images/og-image.png (1200×630)' },
-  { label: 'Structured data', value: 'Organization + WebSite JSON-LD on homepage' },
-  { label: 'Analytics', value: 'Facebook Pixel + GA4 + Google Ads — implemented, IDs unconfigured' },
-  { label: 'Backend', value: 'Supabase — contacts CRM, automations, Stripe checkout edge functions' },
-  { label: 'Primary CTA', value: '"Get Early Access" → waitlist popup / checkout' },
-]
-
 const pageSpeed = [
   { label: 'Performance' },
   { label: 'Accessibility' },
@@ -156,12 +93,6 @@ const pageSpeed = [
 ]
 
 const phase2: { priority: 'High' | 'Medium' | 'Low'; scope: string; issue: string; fix: string }[] = [
-  {
-    priority: 'High',
-    scope: 'Tracking',
-    issue: 'Pixel/measurement/conversion IDs are still unset in production.',
-    fix: 'Populate real IDs in /admin/settings and verify firing with each platform’s test/debug tool.',
-  },
   {
     priority: 'Low',
     scope: 'PageSpeed',
@@ -177,11 +108,78 @@ const phase2: { priority: 'High' | 'Medium' | 'Low'; scope: string; issue: strin
 ]
 
 export function ReportAuditPage() {
+  const [settings, setSettings] = useState<PixelTrackingSettings | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    loadPixelSettings().then((result) => {
+      if (!cancelled) setSettings(result)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   const today = new Date().toLocaleDateString(undefined, {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   })
+
+  const fbId = settings?.facebook.pixel_id.trim() ?? ''
+  const gaId = settings?.google_analytics.measurement_id.trim() ?? ''
+  const adsId = settings?.google_ads.conversion_id.trim() ?? ''
+  const loaded = settings !== null
+  const configuredCount = [fbId, gaId, adsId].filter(Boolean).length
+
+  const trackers = [
+    {
+      tool: 'Facebook Pixel',
+      id: fbId || 'Set via /admin/settings',
+      source: 'connect.facebook.net/en_US/fbevents.js',
+      configured: Boolean(fbId),
+      notes: 'Loads once a pixel ID is saved. Fires PageView, Lead, AddToCart, Purchase — each toggleable per event.',
+    },
+    {
+      tool: 'Google Analytics (GA4)',
+      id: gaId || 'Set via /admin/settings',
+      source: 'googletagmanager.com/gtag/js',
+      configured: Boolean(gaId),
+      notes: 'Fires page_view, generate_lead, and purchase events once a measurement ID is saved.',
+    },
+    {
+      tool: 'Google Ads',
+      id: adsId || 'Set via /admin/settings',
+      source: 'shares gtag.js with GA4',
+      configured: Boolean(adsId),
+      notes: 'Fires conversion events for leads and purchases once a conversion ID and labels are saved.',
+    },
+  ]
+
+  const trackingStatus: Status =
+    configuredCount === 3 ? 'Fixed' : configuredCount > 0 ? 'Review' : 'Open'
+
+  const issues: { area: string; issue: string; resolution: string; status: Status }[] = [
+    ...staticIssues,
+    {
+      area: 'Tracking — pixel configuration',
+      issue:
+        'Facebook Pixel, GA4, and Google Ads code is implemented, but all IDs are empty by default.',
+      resolution: loaded
+        ? `${configuredCount}/3 trackers configured in /admin/settings. Verify events fire in each platform's test tool.`
+        : 'Enter live pixel / measurement / conversion IDs in /admin/settings, then verify events in each platform’s test tool.',
+      status: trackingStatus,
+    },
+  ]
+
+  const stats = [
+    { value: '3', label: 'Content Pages' },
+    { value: '3/3', label: 'With Meta Description' },
+    { value: '3/3', label: 'With OG Tags' },
+    { value: '3/3', label: 'With Canonical' },
+    { value: '3/3', label: 'Unique Titles' },
+    { value: loaded ? `${configuredCount}/3` : '…', label: 'Trackers Configured' },
+  ]
 
   return (
     <main className="report-audit">
@@ -214,17 +212,19 @@ export function ReportAuditPage() {
           Unique per-page titles, descriptions, Open Graph + Twitter tags,
           canonicals, Schema.org JSON-LD, sitemap/robots, an SPA fallback
           rule, and build-time prerendering are all live for the 3 content
-          pages. PNG/Apple-touch favicons are in place. Facebook Pixel,
-          Google Analytics, and Google Ads are fully wired with page-view,
-          lead, add-to-cart, and purchase events, toggleable from
-          /admin/settings.
+          pages. PNG/Apple-touch favicons are in place.
+          {loaded && configuredCount > 0
+            ? ` ${configuredCount}/3 tracking platforms are configured and live.`
+            : ''}
         </p>
-        <p>
-          <span className="ra-summary__icon ra-summary__icon--warn">⚠</span>
-          Remaining item: tracker IDs (Facebook Pixel / GA4 / Google Ads) are
-          still unconfigured, and no PageSpeed baseline has been captured
-          yet.
-        </p>
+        {loaded && configuredCount < 3 ? (
+          <p>
+            <span className="ra-summary__icon ra-summary__icon--warn">⚠</span>
+            Remaining: {3 - configuredCount} tracking platform
+            {3 - configuredCount === 1 ? '' : 's'} still unconfigured, and no
+            PageSpeed baseline has been captured yet.
+          </p>
+        ) : null}
       </section>
 
       <section className="ra-section">
@@ -263,6 +263,9 @@ export function ReportAuditPage() {
 
       <section className="ra-section">
         <h2>Tracking &amp; Analytics Codes</h2>
+        <p className="ra-section__sub">
+          Live status, read from /admin/settings each time this page loads.
+        </p>
         <div className="ra-table-wrap">
           <table className="ra-table">
             <thead>
@@ -285,8 +288,14 @@ export function ReportAuditPage() {
                     <code>{row.source}</code>
                   </td>
                   <td>
-                    <span className="ra-badge ra-badge--review">
-                      {row.status}
+                    <span
+                      className={
+                        row.configured
+                          ? 'ra-badge ra-badge--done'
+                          : 'ra-badge ra-badge--review'
+                      }
+                    >
+                      {row.configured ? 'Configured' : 'Not configured'}
                     </span>
                   </td>
                   <td>{row.notes}</td>
@@ -392,12 +401,60 @@ export function ReportAuditPage() {
         <div className="ra-table-wrap">
           <table className="ra-table ra-table--kv">
             <tbody>
-              {infrastructure.map((row) => (
-                <tr key={row.label}>
-                  <th scope="row">{row.label}</th>
-                  <td>{row.value}</td>
-                </tr>
-              ))}
+              <tr>
+                <th scope="row">Framework</th>
+                <td>Vite 8.2 + React 19.2 (client-rendered SPA)</td>
+              </tr>
+              <tr>
+                <th scope="row">Router</th>
+                <td>react-router-dom 7 — BrowserRouter</td>
+              </tr>
+              <tr>
+                <th scope="row">Rendering</th>
+                <td>
+                  Client-rendered SPA + build-time prerendered HTML snapshot
+                  (scripts/prerender.mjs) for the 3 marketing routes
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">Sitemap</th>
+                <td>public/sitemap.xml</td>
+              </tr>
+              <tr>
+                <th scope="row">robots.txt</th>
+                <td>public/robots.txt</td>
+              </tr>
+              <tr>
+                <th scope="row">SPA fallback</th>
+                <td>public/_redirects (catch-all → /index.html)</td>
+              </tr>
+              <tr>
+                <th scope="row">Favicon</th>
+                <td>/favicon.svg + /favicon-32x32.png + /apple-touch-icon.png</td>
+              </tr>
+              <tr>
+                <th scope="row">OG image</th>
+                <td>/images/og-image.png (1200×630)</td>
+              </tr>
+              <tr>
+                <th scope="row">Structured data</th>
+                <td>Organization + WebSite JSON-LD on homepage</td>
+              </tr>
+              <tr>
+                <th scope="row">Analytics</th>
+                <td>
+                  Facebook Pixel + GA4 + Google Ads —{' '}
+                  {loaded ? `${configuredCount}/3 configured` : 'checking…'}
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">Backend</th>
+                <td>Supabase — contacts CRM, automations, Stripe checkout edge functions</td>
+              </tr>
+              <tr>
+                <th scope="row">Primary CTA</th>
+                <td>"Get Early Access" → waitlist popup / checkout</td>
+              </tr>
             </tbody>
           </table>
         </div>
