@@ -62,6 +62,21 @@ const staticIssues: { area: string; issue: string; resolution: string; status: S
       'Added favicon-32x32.png and apple-touch-icon.png, rendered from the existing SVG, and linked them in index.html.',
     status: 'Fixed',
   },
+  {
+    area: 'This page — prerendering & indexing',
+    issue:
+      'This page itself was not in the prerender route list, so crawlers and PageSpeed both saw the prerendered homepage HTML (hero image included) instead of its own content, and a pathname/trailing-slash mismatch made its meta robots tag fall back to noindex regardless of the config.',
+    resolution:
+      'Added /report-audit to scripts/prerender.mjs and src/data/pageMeta.ts, and fixed getPageMeta to normalize trailing slashes. robots.txt no longer disallows this page.',
+    status: 'Fixed',
+  },
+  {
+    area: 'Bundle size',
+    issue: 'Main JS chunk was ~650KB minified (~177KB gzipped), including the entire admin dashboard and checkout flow on every page load.',
+    resolution:
+      'Route-level code-splitting via React.lazy for /admin/* and /checkout/* — the shared/homepage bundle dropped to ~528KB minified (~153KB gzipped).',
+    status: 'Fixed',
+  },
 ]
 
 const pages = [
@@ -85,35 +100,22 @@ const pages = [
   },
 ]
 
-const pageSpeedCapturedAt = 'Sep 18, 2026 (mobile, Lighthouse)'
+const pageSpeedCapturedAt = 'Sep 19, 2026 (mobile, Lighthouse, this page)'
 
 const pageSpeed = [
-  { label: 'Performance', score: 61 },
+  { label: 'Performance', score: 86 },
   { label: 'Accessibility', score: 100 },
   { label: 'Best Practices', score: 96 },
-  { label: 'SEO', score: 66 },
+  { label: 'SEO', score: 100 },
 ]
 
 const phase2: { priority: 'High' | 'Medium' | 'Low'; scope: string; issue: string; fix: string }[] = [
   {
-    priority: 'Medium',
-    scope: 'SEO',
-    issue:
-      'robots.txt disallows /report-audit while the page itself sets <meta name="robots" content="index, follow">, so it is blocked from indexing.',
-    fix: 'Decide whether this page should be public: remove the Disallow rule to allow indexing, or drop the meta tag to make the block intentional.',
-  },
-  {
     priority: 'Low',
     scope: 'Performance',
     issue:
-      'Largest Contentful Paint is 5.8s on mobile, driven mainly by a 281KB unoptimized hero image and render-blocking GTM/Facebook Pixel scripts.',
-    fix: 'Resize/compress the largest hero image and defer third-party tracking scripts until after first paint.',
-  },
-  {
-    priority: 'Low',
-    scope: 'Bundle size',
-    issue: 'Main JS chunk is ~650KB minified (~177KB gzipped) — Vite flags it as large.',
-    fix: 'Consider route-level code-splitting (dynamic import) for /admin and checkout flows.',
+      'Largest Contentful Paint is 3.8s on mobile, mainly from third-party scripts (Google Tag Manager 172KB, Facebook Pixel 108KB) and ~203KB of unused JavaScript in the shared bundle.',
+    fix: 'Defer loading GTM/Facebook Pixel until after first paint, and audit the shared bundle for unused code.',
   },
 ]
 
@@ -234,12 +236,6 @@ export function ReportAuditPage() {
             {3 - configuredCount === 1 ? '' : 's'} still unconfigured.
           </p>
         ) : null}
-        <p>
-          <span className="ra-summary__icon ra-summary__icon--warn">⚠</span>
-          PageSpeed: robots.txt currently blocks this page from indexing
-          despite its own meta tag allowing it — see the PageSpeed Insights
-          section below.
-        </p>
       </section>
 
       <section className="ra-section">
