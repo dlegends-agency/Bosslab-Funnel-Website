@@ -224,7 +224,9 @@ function ContactsPanel({ runs }: { runs: RunRow[] }) {
             ? run.status === 'failed'
             : filter === 'completed'
               ? run.status === 'completed'
-              : false
+              : filter === 'paused'
+                ? run.status === 'waiting'
+                : false
 
       if (!statusMatch) return false
       if (!q) return true

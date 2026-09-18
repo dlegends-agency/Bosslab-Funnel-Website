@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { runAutomationSteps } from "../_shared/automationRunner.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -168,7 +169,7 @@ Deno.serve(async (req: Request) => {
           .select("id", { count: "exact", head: true })
           .eq("automation_id", automation.id)
           .eq("contact_id", contactId)
-          .in("status", ["completed", "running"]);
+          .in("status", ["completed", "running", "waiting"]);
         if ((count ?? 0) > 0) {
           return json({
             ok: true,
@@ -199,164 +200,13 @@ Deno.serve(async (req: Request) => {
           message: "Webhook received",
         });
 
-        const { data: steps } = await admin
-          .from("automation_steps")
-          .select("*")
-          .eq("automation_id", automation.id)
-          .order("position", { ascending: true });
-
-        const { data: contactRow } = await admin
-          .from("contacts")
-          .select("*")
-          .eq("id", contactId)
-          .single();
-
-        let failed = false;
-        let index = 0;
-        const stepList = steps ?? [];
-        const visited = new Set<number>();
-
-        while (index < stepList.length) {
-          if (visited.has(index)) {
-            failed = true;
-            await admin.from("automation_run_logs").insert({
-              run_id: run.id,
-              step_id: stepList[index]?.id ?? null,
-              status: "failed",
-              message: "Jump loop detected",
-            });
-            break;
-          }
-          visited.add(index);
-          const step = stepList[index] as {
-            id: string;
-            step_type: string;
-            action_type: string | null;
-            config: Record<string, unknown>;
-          };
-
-          try {
-            let message = "Step completed";
-            let exit = false;
-            let jumpTo: number | null = null;
-
-            if (step.step_type === "delay") {
-              const amount = Number(step.config.delay_amount ?? step.config.delay_days ?? 1);
-              const unit = asString(step.config.delay_unit) || "days";
-              message = `Delay recorded (${amount} ${unit})`;
-            } else if (step.step_type === "exit") {
-              message = asString(step.config.exit_reason) || "Exited automation";
-              exit = true;
-            } else if (step.step_type === "goal") {
-              message = `Goal reached: ${asString(step.config.goal_name) || "Goal"}`;
-              exit = true;
-            } else if (step.step_type === "jump") {
-              jumpTo = Number(step.config.jump_to_position ?? 0);
-              message = `Jumping to step ${jumpTo + 1}`;
-            } else if (step.step_type === "split_path") {
-              const percent = Math.min(100, Math.max(0, Number(step.config.split_percent ?? 50)));
-              const path = Math.random() * 100 < percent ? "A" : "B";
-              message = `Split path ${path} selected (${percent}% / ${100 - percent}%)`;
-            } else if (step.step_type === "condition") {
-              const categories = Array.isArray(step.config.condition_categories)
-                ? (step.config.condition_categories as string[])
-                : asString(step.config.condition_category)
-                  ? [asString(step.config.condition_category)]
-                  : [];
-              const contact = contactRow as Record<string, unknown> | null;
-              const passed = categories.some((category) => {
-                if (category === "Contact Details") return Boolean(asString(contact?.email));
-                if (category === "User" || category === "Segments") {
-                  return asString(contact?.status) === "subscribed";
-                }
-                if (category === "WooCommerce" || category === "Engagement") {
-                  return Boolean(asString(contact?.order_plan));
-                }
-                if (category === "Geography") return Boolean(asString(contact?.address));
-                return true;
-              });
-              message = passed
-                ? `Condition passed (${categories.join(" OR ")})`
-                : `Condition failed (${categories.join(" OR ")}) — exiting`;
-              exit = !passed;
-            } else if (step.action_type === "send_email") {
-              message = `Email queued: ${asString(step.config.email_subject) || "Untitled"}`;
-            } else if (step.action_type === "add_to_list" && asString(step.config.list_id)) {
-              await admin.from("contact_lists").upsert(
-                { contact_id: contactId, list_id: asString(step.config.list_id) },
-                { onConflict: "contact_id,list_id", ignoreDuplicates: true },
-              );
-              message = `Added to list ${asString(step.config.list_id)}`;
-            } else if (step.action_type === "remove_from_list" && asString(step.config.list_id)) {
-              await admin
-                .from("contact_lists")
-                .delete()
-                .eq("contact_id", contactId)
-                .eq("list_id", asString(step.config.list_id));
-              message = `Removed from list ${asString(step.config.list_id)}`;
-            } else if (step.action_type === "add_tag" && asString(step.config.tag_id)) {
-              await admin.from("contact_tags").upsert(
-                { contact_id: contactId, tag_id: asString(step.config.tag_id) },
-                { onConflict: "contact_id,tag_id", ignoreDuplicates: true },
-              );
-              message = `Added tag ${asString(step.config.tag_id)}`;
-            } else if (step.action_type === "remove_tag" && asString(step.config.tag_id)) {
-              await admin
-                .from("contact_tags")
-                .delete()
-                .eq("contact_id", contactId)
-                .eq("tag_id", asString(step.config.tag_id));
-              message = `Removed tag ${asString(step.config.tag_id)}`;
-            } else if (step.action_type === "zapier_webhook" && asString(step.config.webhook_url)) {
-              await fetch(asString(step.config.webhook_url), {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  id: contactId,
-                  source: "bosslab_automation_webhook",
-                }),
-              });
-              message = "Zapier webhook sent";
-            } else {
-              message = `Step ${step.step_type} completed`;
-            }
-
-            await admin.from("automation_run_logs").insert({
-              run_id: run.id,
-              step_id: step.id,
-              status: "success",
-              message,
-            });
-            await admin
-              .from("automation_runs")
-              .update({ current_step: index + 1 })
-              .eq("id", run.id);
-
-            if (exit) break;
-            if (jumpTo != null && jumpTo >= 0 && jumpTo < stepList.length) {
-              index = jumpTo;
-              continue;
-            }
-            index += 1;
-          } catch (stepErr) {
-            failed = true;
-            await admin.from("automation_run_logs").insert({
-              run_id: run.id,
-              step_id: step.id,
-              status: "failed",
-              message: stepErr instanceof Error ? stepErr.message : "Step failed",
-            });
-            break;
-          }
-        }
-
-        await admin
-          .from("automation_runs")
-          .update({
-            status: failed ? "failed" : "completed",
-            finished_at: new Date().toISOString(),
-          })
-          .eq("id", run.id);
+        await runAutomationSteps({
+          admin,
+          runId: run.id as string,
+          automationId: automation.id as string,
+          contactId,
+          startIndex: 0,
+        });
       }
     }
 

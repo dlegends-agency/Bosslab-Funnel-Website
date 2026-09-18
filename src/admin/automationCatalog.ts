@@ -211,7 +211,7 @@ export function defaultOrderTriggerConfig(
   triggerId: string | null | undefined,
 ): {
   order_statuses: Array<'completed' | 'draft' | 'on_hold' | 'processing'>
-  order_contains: 'any' | 'specific' | 'category'
+  order_contains: 'any' | 'specific'
   product_ids: string[]
   run_frequency: 'once' | 'multiple'
 } {
@@ -237,9 +237,7 @@ export function describeOrderTriggerConfig(config: {
   const contains =
     config.order_contains === 'specific'
       ? `specific plans (${(config.product_ids ?? []).length || 0} selected)`
-      : config.order_contains === 'category'
-        ? 'specific category products'
-        : 'any product'
+      : 'any product'
   const frequency =
     config.run_frequency === 'multiple' ? 'multiple times' : 'once'
   return `Statuses: ${statuses}. Contains: ${contains}. Runs ${frequency} per contact.`

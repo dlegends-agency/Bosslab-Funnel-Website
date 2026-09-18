@@ -32,7 +32,6 @@ export function EmailTestPage() {
 
     const { data, error: fnError } = await supabase.functions.invoke('send-email', {
       body: {
-        from: 'support@bosslabai.pages.dev',
         to: to.trim(),
         subject: subject.trim(),
         html: html.trim(),
@@ -42,11 +41,14 @@ export function EmailTestPage() {
     setSending(false)
 
     if (fnError) {
+      const context = (fnError as { context?: Response }).context
+      const body = context ? await context.json().catch(() => null) : null
       setError(
-        fnError.message.includes('Failed to send') ||
+        body?.error ||
+          (fnError.message.includes('Failed to send') ||
           fnError.message.includes('FunctionsFetchError')
-          ? 'Could not reach the send-email function. Deploy it and add RESEND_API_KEY in Supabase secrets.'
-          : fnError.message || 'Could not send email.',
+            ? 'Could not reach the send-email function. Deploy it and add RESEND_API_KEY in Supabase secrets.'
+            : fnError.message || 'Could not send email.'),
       )
       return
     }

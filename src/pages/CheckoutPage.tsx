@@ -7,9 +7,35 @@ import {
   type CheckoutPlanId,
 } from '../data/checkoutPlans'
 import { runStripePurchaseAutomations } from '../lib/automationEngine'
+import {
+  DEFAULT_CHECKOUT_SETTINGS,
+  loadCheckoutSettings,
+  type CheckoutSettings,
+} from '../lib/checkoutSettings'
+import {
+  DEFAULT_GENERAL_SETTINGS,
+  loadGeneralSettings,
+  type GeneralSettings,
+} from '../lib/generalSettings'
 import { supabase, type Contact } from '../lib/supabase'
 import { trackAddToCart, trackPurchase } from '../lib/tracking'
 import './CheckoutPage.css'
+
+function useCheckoutAndGeneralSettings() {
+  const [checkoutSettings, setCheckoutSettings] = useState<CheckoutSettings>(
+    DEFAULT_CHECKOUT_SETTINGS,
+  )
+  const [generalSettings, setGeneralSettings] = useState<GeneralSettings>(
+    DEFAULT_GENERAL_SETTINGS,
+  )
+
+  useEffect(() => {
+    void loadCheckoutSettings().then(setCheckoutSettings)
+    void loadGeneralSettings().then(setGeneralSettings)
+  }, [])
+
+  return { checkoutSettings, generalSettings }
+}
 
 export function CheckoutPage() {
   const [params] = useSearchParams()
@@ -20,6 +46,7 @@ export function CheckoutPage() {
   const [selected, setSelected] = useState<CheckoutPlanId>('growth')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const { checkoutSettings } = useCheckoutAndGeneralSettings()
 
   const selectedPlan = useMemo(
     () => checkoutPlans.find((plan) => plan.id === selected)!,
@@ -76,11 +103,11 @@ export function CheckoutPage() {
       <div className="checkout__inner">
         <header className="checkout__header">
           <p className="checkout__brand">Boss Lab AI</p>
-          <h1 className="checkout__title">Choose your plan</h1>
+          <h1 className="checkout__title">{checkoutSettings.page_title}</h1>
           <p className="checkout__sub">
             {name
               ? `Welcome, ${name} — pick the plan that fits your business.`
-              : 'Pick the plan that fits your business.'}
+              : checkoutSettings.page_subtitle}
           </p>
           {email ? <p className="checkout__email">{email}</p> : null}
         </header>
@@ -160,6 +187,12 @@ export function CheckoutPage() {
 
           <p className="checkout__secure">
             Secure checkout powered by Stripe (test mode). Cancel anytime.
+            {checkoutSettings.show_terms_link ? (
+              <>
+                {' '}
+                <Link to="/terms-and-conditions">Terms &amp; Conditions</Link>
+              </>
+            ) : null}
           </p>
           <Link to="/" className="checkout__back">
             ← Back to home
@@ -176,6 +209,9 @@ export function CheckoutSuccessPage() {
   const contactId = params.get('contact')
 
   const [destination, setDestination] = useState<string | null>(null)
+  const { checkoutSettings, generalSettings } = useCheckoutAndGeneralSettings()
+  const supportEmail =
+    checkoutSettings.support_email_override || generalSettings.support_email
 
   useEffect(() => {
     if (!contactId) return
@@ -263,8 +299,8 @@ export function CheckoutSuccessPage() {
         <p className="thankyou__closing">
           Please contact support if you don&apos;t hear from us shortly.
           <br />
-          <a className="thankyou__support" href="mailto:support@bosslabai.com">
-            support@bosslabai.com
+          <a className="thankyou__support" href={`mailto:${supportEmail}`}>
+            {supportEmail}
           </a>
         </p>
 
