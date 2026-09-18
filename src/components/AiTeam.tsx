@@ -28,7 +28,7 @@ export function AiTeam() {
 
         <div className="section-media">
           <img
-            src="/images/ai-team.png"
+            src="/images/ai-team.webp"
             alt="Business owner with AI employee robots for reception, sales, marketing, analytics, and research"
             width={1983}
             height={793}

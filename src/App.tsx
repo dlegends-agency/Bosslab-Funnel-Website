@@ -10,6 +10,7 @@ import { EmailTestPage } from './admin/EmailTestPage'
 import { ListsPage } from './admin/ListsPage'
 import { SettingsPage } from './admin/SettingsPage'
 import { TagsPage } from './admin/TagsPage'
+import { PageMeta } from './components/PageMeta'
 import { TrackingPixels } from './components/TrackingPixels'
 import {
   CheckoutCancelPage,
@@ -20,6 +21,7 @@ import { HomePage } from './pages/HomePage'
 import { MissionControlPage } from './pages/MissionControlPage'
 import { OnboardingPage } from './pages/OnboardingPage'
 import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage'
+import { ReportAuditPage } from './pages/ReportAuditPage'
 import { TermsPage } from './pages/TermsPage'
 import './App.css'
 
@@ -37,6 +39,7 @@ function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <PageMeta />
       <TrackingPixels />
       <Routes>
         <Route
@@ -79,6 +82,7 @@ function App() {
             </div>
           }
         />
+        <Route path="/report-audit" element={<ReportAuditPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

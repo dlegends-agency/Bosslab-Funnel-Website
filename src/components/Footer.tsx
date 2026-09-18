@@ -8,7 +8,7 @@ export function Footer() {
       <div className="footer__inner section-inner">
         <img
           className="footer__brand"
-          src="/images/bosslabai-logo.png"
+          src="/images/bosslabai-logo.webp"
           alt="Boss Lab AI"
           width={2048}
           height={682}

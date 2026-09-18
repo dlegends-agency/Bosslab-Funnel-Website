@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /checkout
+Disallow: /onboarding
+Disallow: /mission-control
+Disallow: /report-audit
+
+Sitemap: https://bosslab-funnel-website.pages.dev/sitemap.xml
