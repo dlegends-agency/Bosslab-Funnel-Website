@@ -15,6 +15,7 @@ const routes = [
   { path: '/', outFile: 'index.html' },
   { path: '/privacy-policy', outFile: 'privacy-policy/index.html' },
   { path: '/terms-and-conditions', outFile: 'terms-and-conditions/index.html' },
+  { path: '/report-audit', outFile: 'report-audit/index.html' },
 ]
 
 async function main() {
