@@ -24,6 +24,12 @@ export const pageMetaList: PageMetaEntry[] = [
     description:
       'Review the terms and conditions that govern your use of the Boss Lab AI website and services.',
   },
+  {
+    path: '/report-audit',
+    title: 'SEO & Site Audit Report — Boss Lab AI',
+    description:
+      'A live audit of Boss Lab AI’s own site: meta tags, Open Graph, crawlability, tracking setup, and PageSpeed Insights results.',
+  },
 ]
 
 export const defaultPageMeta: PageMetaEntry = {
@@ -35,6 +41,16 @@ export const defaultPageMeta: PageMetaEntry = {
 
 const pageMetaByPath = new Map(pageMetaList.map((entry) => [entry.path, entry]))
 
+function normalizePathname(pathname: string) {
+  if (pathname.length > 1 && pathname.endsWith('/')) {
+    return pathname.slice(0, -1)
+  }
+  return pathname
+}
+
 export function getPageMeta(pathname: string): PageMetaEntry {
-  return pageMetaByPath.get(pathname) ?? { ...defaultPageMeta, path: pathname }
+  const normalized = normalizePathname(pathname)
+  return (
+    pageMetaByPath.get(normalized) ?? { ...defaultPageMeta, path: normalized }
+  )
 }
