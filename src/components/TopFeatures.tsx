@@ -3,62 +3,62 @@ import { useReveal } from '../hooks/useReveal'
 
 const features = [
   {
-    image: 'feature-ai-workforce.png',
+    image: 'feature-ai-workforce.webp',
     color: '#8b5cf6',
     title: 'AI Workforce',
     description:
       'Give your business a specialized AI team for Sales, Marketing, Support, Research, Reception, Design, and more.',
   },
   {
-    image: 'feature-ai-ceo.png',
+    image: 'feature-ai-ceo.webp',
     color: '#3b82f6',
     title: 'AI CEO',
     description:
       'Your AI business leader reviews activity, recommends priorities, and coordinates your AI workforce.',
   },
   {
-    image: 'feature-ai-phone-booking.png',
+    image: 'feature-ai-phone-booking.webp',
     color: '#8b5cf6',
     title: 'AI Phone Booking',
     description:
       'AI-powered phone calls for customer inquiries, lead handling, and appointment booking.',
   },
   {
-    image: 'feature-ai-calendar-scheduling.png',
+    image: 'feature-ai-calendar-scheduling.webp',
     color: '#2f9fed',
     title: 'AI Calendar Scheduling',
     description: 'Automate appointments, scheduling, and calendar management.',
   },
   {
-    image: 'feature-ai-marketing-social-media.png',
+    image: 'feature-ai-marketing-social-media.webp',
     color: '#ec4899',
     title: 'AI Marketing & Social Media',
     description:
       'Create marketing content and help manage social media campaigns.',
   },
   {
-    image: 'feature-3d-office-setup.png',
+    image: 'feature-3d-office-setup.webp',
     color: '#ec4899',
     title: '3D Office Setup',
     description:
       'See your AI workforce inside a visual 3D office and understand their roles and activities.',
   },
   {
-    image: 'feature-accept-customer-payments.png',
+    image: 'feature-accept-customer-payments.webp',
     color: '#3b82f6',
     title: 'Accept Customer Payments',
     description:
       'Accept and manage customer payments through your AI-powered business system.',
   },
   {
-    image: 'feature-ai-sales-crm.png',
+    image: 'feature-ai-sales-crm.webp',
     color: '#22c55e',
     title: 'AI Sales & CRM',
     description:
       'Manage leads, follow-ups, qualification, pipeline activity, and customer information.',
   },
   {
-    image: 'feature-email-sms-automation.png',
+    image: 'feature-email-sms-automation.webp',
     color: '#ec4899',
     title: 'Email & SMS Automation',
     description:

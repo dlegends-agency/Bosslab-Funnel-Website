@@ -16,7 +16,7 @@ export function Hero({ onCtaClick }: HeroProps) {
             style={{ '--d': '0ms' } as CSSProperties}
           >
             <img
-              src="/images/bosslabai-logo.png"
+              src="/images/bosslabai-logo.webp"
               alt="Boss Lab AI"
               width={2048}
               height={682}
@@ -59,7 +59,7 @@ export function Hero({ onCtaClick }: HeroProps) {
         <div className="hero__image-wrap" aria-hidden="true">
           <img
             className="hero__image"
-            src="/images/ai3doffice.png"
+            src="/images/ai3doffice.webp"
             alt=""
             width={2048}
             height={1152}

@@ -1187,7 +1187,7 @@
       rgba(4, 6, 18, 0.78) 45%,
       rgba(4, 6, 18, 0.6) 100%
     ),
-    url('/images/boss-before.png') center / cover no-repeat;
+    url('/images/boss-before.webp') center / cover no-repeat;
 }
 
 .comparison__col--muted:hover {
@@ -1203,7 +1203,7 @@
       rgba(8, 6, 28, 0.78) 45%,
       rgba(8, 6, 28, 0.6) 100%
     ),
-    url('/images/boss-after.png') center / cover no-repeat;
+    url('/images/boss-after.webp') center / cover no-repeat;
   box-shadow: 0 0 0 1px rgba(174, 98, 255, 0.12), 0 0 30px rgba(174, 98, 255, 0.15);
 }
 
