@@ -26,28 +26,29 @@ export function Hero({ onCtaClick }: HeroProps) {
             className="hero__eyebrow reveal-item"
             style={{ '--d': '80ms' } as CSSProperties}
           >
-            YOUR AI BUSINESS TEAM IS READY
+            The operating system after software
           </p>
           <h1
             className="hero__title reveal-item"
             style={{ '--d': '160ms' } as CSSProperties}
           >
-            Meet Your
+            STOP MANAGING
             <br />
-            <span className="accent">New AI Team</span>
+            SOFTWARE.
+            <br />
+            <span className="accent">
+              START
+              <br />
+              DIRECTING.
+            </span>
           </h1>
-          <p
-            className="hero__subcopy reveal-item"
-            style={{ '--d': '240ms' } as CSSProperties}
-          >
-            A complete AI workforce inside a 3D office built for local businesses.
-          </p>
           <p
             className="hero__copy reveal-item"
             style={{ '--d': '320ms' } as CSSProperties}
           >
-            Answer calls, capture leads, book appointments, create marketing, follow
-            up automatically, and grow your business - 24/7.
+            BossLab AI turns scattered business tools into a coordinated AI
+            workforce—visible, accountable and built to move customers from
+            inquiry to action.
           </p>
           <div
             className="hero__cta reveal-item"

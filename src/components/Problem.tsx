@@ -9,14 +9,23 @@ export function Problem() {
   return (
     <section ref={ref} className={`section problem reveal ${className}`}>
       <div className="section-inner">
-        <h2 className="section-title accent">
-          How Many Customers Are You Losing When Nobody Answers?
+        <p className="section-eyebrow">The invisible leak</p>
+        <h2 className="section-title">
+          THE JOB YOU NEVER
+          <br />
+          <span className="accent">KNEW YOU LOST.</span>
         </h2>
 
         <div className="problem__copy">
-          <p>Your business can only answer so many calls.</p>
-          <p>Your team can only respond to so many messages.</p>
-          <p>And your customers will not always wait.</p>
+          <p>
+            You&rsquo;re serving a customer when the next call comes in.
+            Another lead is waiting. Another appointment needs a response.
+          </p>
+          <p>
+            Your calls, leads, follow-ups, messages, and calendar are
+            scattered across different tools. You become the one holding
+            everything together.
+          </p>
         </div>
 
         <div className="pain-grid">
@@ -55,12 +64,6 @@ export function Problem() {
           </p>
         </div>
 
-        <div className="problem__answer">
-          <p>
-            One missed customer can cost more than the tools that help you
-            capture them.
-          </p>
-        </div>
       </div>
     </section>
   )
