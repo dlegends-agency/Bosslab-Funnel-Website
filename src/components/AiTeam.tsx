@@ -6,25 +6,53 @@ export function AiTeam() {
   return (
     <section ref={ref} className={`section section--deep ai-team reveal ${className}`}>
       <div className="section-inner">
+        <p className="section-eyebrow">Change the frame. Change the category.</p>
         <h2 className="section-title">
-          Your AI Business Team, <span className="accent">All In One Place</span>
+          ANOTHER DASHBOARD IS
+          <br />
+          <span className="accent">NOT ANOTHER EMPLOYEE.</span>
         </h2>
 
         <div className="problem__copy">
           <p>
-            What if your business had a team that could keep working even
-            when you were busy?
+            What if your business had a team that could keep working while
+            you focus on running the business?
           </p>
           <p>
-            BossLab AI gives you specialized AI agents that can help with
-            sales, marketing, customer support, reception, research,
-            scheduling, and more.
+            BossLab AI connects specialized AI capabilities for reception,
+            sales, marketing, support, research, scheduling, and operations
+            into one business workforce.
           </p>
-          <p>Your AI workforce works together from one connected system.</p>
+          <p>
+            Your AI workforce works together, using your business
+            information, workflows, and tools to keep work moving.
+          </p>
         </div>
 
-        <p className="pivot-text">You manage the business.</p>
-        <p className="pivot-text">Your AI team handles the repetitive work.</p>
+        <p className="pivot-text">You set the direction.</p>
+        <p className="pivot-text">Your AI workforce handles the work.</p>
+
+        <div className="model-shift">
+          <div className="model-shift__card">
+            <span className="model-shift__label">Old Model</span>
+            <h3 className="model-shift__word">Tools</h3>
+            <p>More tabs. More configuration. More work for the owner.</p>
+          </div>
+          <div className="model-shift__card model-shift__card--highlight">
+            <span className="model-shift__label model-shift__label--accent">
+              The Shift
+            </span>
+            <h3 className="model-shift__word accent">Action</h3>
+            <p>Agents carry work forward, with rules, handoffs and visibility.</p>
+          </div>
+          <div className="model-shift__card">
+            <span className="model-shift__label model-shift__label--accent">
+              New Role
+            </span>
+            <h3 className="model-shift__word accent">Leader</h3>
+            <p>The owner sets priorities, reviews exceptions and sees outcomes.</p>
+          </div>
+        </div>
 
         <div className="section-media">
           <img

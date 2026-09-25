@@ -4,11 +4,11 @@ import { CheckCircleIcon } from './Icons'
 import { CtaButton } from './CtaButton'
 
 const officeChecklist = [
-  'Walk into your virtual office.',
-  'Meet your AI employees.',
-  'See their roles.',
-  'See what they are working on.',
-  'See the different parts of your business operating together.',
+  'Voice',
+  'Qualification',
+  'Booking',
+  'Follow-up',
+  'Owner visibility',
 ]
 
 type DashboardProps = {
@@ -22,14 +22,13 @@ export function Dashboard({ onCtaClick }: DashboardProps) {
     <section ref={ref} className={`section section--deep ai-dashboard reveal ${className}`}>
       <div className="section-inner">
         <h2 className="section-title">
-          Don&apos;t Just Use AI.{' '}
-          <span className="accent">See Your AI Team At Work.</span>
+          MEET YOUR <span className="accent">ALWAYS-ON</span> FRONT OFFICE.
         </h2>
 
         <div className="problem__copy">
           <p>
-            BossLab AI gives your business something different. A 3D office
-            where your AI workforce has a place to work.
+            One command view. Multiple specialized roles. A shared
+            understanding of how your business actually works.
           </p>
         </div>
 
@@ -53,10 +52,7 @@ export function Dashboard({ onCtaClick }: DashboardProps) {
         </div>
 
         <div className="problem__copy">
-          <p>
-            Your AI workforce becomes visible, organized, and easier to
-            understand.
-          </p>
+          <p>INTERFACE VISUALIZATION &middot; NOT A LIVE SCREENSHOT</p>
         </div>
 
         <CtaButton onClick={onCtaClick} />

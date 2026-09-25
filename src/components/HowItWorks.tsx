@@ -1,28 +1,23 @@
-import type { CSSProperties } from 'react'
 import { useReveal } from '../hooks/useReveal'
+import { ArrowRightIcon } from './Icons'
 import { CtaButton } from './CtaButton'
 import { Starfield } from './Starfield'
 
-const steps = [
+const flowSteps = [
   {
-    title: 'Build Your AI Team',
-    copy: 'Choose the AI employees your business needs.',
+    tag: '01 / Input',
+    title: 'Business Reality',
+    copy: 'Price sheets · service radius · FAQs · calendar · customer history',
   },
   {
-    title: 'Connect Your Business',
-    copy: 'Connect the tools, calendars, customer information, and workflows your business already uses.',
+    tag: '02 / Context',
+    title: 'Business Memory',
+    copy: 'Permissioned retrieval · workflow rules · context shared across roles',
   },
   {
-    title: 'Give Your AI Team A Mission',
-    copy: 'Tell your AI workforce what you want to accomplish.',
-  },
-  {
-    title: 'Let Your AI Team Work',
-    copy: 'Your AI agents handle tasks, communicate with customers, follow up with leads, and keep work moving.',
-  },
-  {
-    title: 'Stay In Control',
-    copy: 'Monitor your AI workforce from your BossLab AI environment and make decisions when they matter.',
+    tag: '03 / Execution',
+    title: 'Connected Work',
+    copy: 'Answer · qualify · book · follow up · escalate when needed',
   },
 ]
 
@@ -40,25 +35,33 @@ export function HowItWorks({ onCtaClick }: HowItWorksProps) {
     >
       <Starfield />
       <div className="section-inner">
-        <p className="section-eyebrow">HOW BOSS LAB AI WORKS</p>
+        <p className="section-eyebrow">The potential compounding asset</p>
         <h2 className="section-title">
-          Your Business. Your AI Team.{' '}
-          <span className="accent">One Mission.</span>
+          EVERY AGENT KNOWS
+          <br />
+          <span className="accent">YOUR BUSINESS.</span>
         </h2>
+        <p className="section-copy">
+          A receptionist is useful. A receptionist who knows your service
+          area, prices, policies and availability is a system.
+        </p>
 
-        <ol className="steps">
-          {steps.map((step, index) => (
-            <li className="step" key={step.title} style={{ '--i': index } as CSSProperties}>
-              <span className="step__marker" aria-hidden="true">
-                {index + 1}
-              </span>
-              <div className="step__body">
+        <div className="agent-flow">
+          {flowSteps.map((step, index) => (
+            <div className="agent-flow__item" key={step.title}>
+              <div className="agent-flow__card">
+                <span className="agent-flow__tag">{step.tag}</span>
                 <h3>{step.title}</h3>
                 <p>{step.copy}</p>
               </div>
-            </li>
+              {index < flowSteps.length - 1 ? (
+                <span className="agent-flow__arrow" aria-hidden="true">
+                  <ArrowRightIcon />
+                </span>
+              ) : null}
+            </div>
           ))}
-        </ol>
+        </div>
 
         <CtaButton onClick={onCtaClick} />
       </div>
